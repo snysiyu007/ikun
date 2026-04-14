@@ -25,12 +25,10 @@ Claude Code: (自动触发)
 
 ## 安装
 
-### 方式一：一键安装脚本
+### 方式一：一行命令
 
 ```bash
-# 克隆到本地 Claude Code skills 目录
-mkdir -p ~/.claude/skills
-git clone https://github.com/YOUR_USERNAME/wechat-article.git ~/.claude/skills/wechat-article
+mkdir -p ~/.claude/skills && git clone https://github.com/snysiyu007/ikun.git ~/.claude/skills/wechat-article
 ```
 
 ### 方式二：手动复制
