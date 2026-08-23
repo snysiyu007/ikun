@@ -299,25 +299,31 @@ RAIL_BODY = f"""<div class="stage">
 
 
 # ==================================================== 汇报页 A — 能力复用矩阵
-# 1 = 已确认（用户提供）, 2 = 推测待确认
+# 列按覆盖场景数降序：基础四天然排在前面，外圈自然形成递减的尾巴
 EXPERT_COLS = [
-    ('数据官','行业陈景润','base'), ('知识官','行业藏书阁','base'),
-    ('组织协同','行业秘书处','base'), ('任务执行','行业王进喜','base'),
-    ('竞对情报','行业猫头鹰','scene'), ('财务官','行业葛朗台','scene'),
-    ('外部咨询','待命名','scene'), ('营销创意','待命名','scene'),
-    ('用户增长','待命名','scene'), ('品类洞察','待命名','scene'),
+    ('组织协同', '行业秘书处', 'base'), ('任务执行', '行业王进喜', 'base'),
+    ('数据官',   '行业陈景润', 'base'), ('知识官',   '行业藏书阁', 'base'),
+    ('品类洞察', '待命名',     'scene'), ('竞对情报', '行业猫头鹰', 'scene'),
+    ('用户增长', '待命名',     'scene'), ('财务官',   '行业葛朗台', 'scene'),
+    ('外部咨询', '待命名',     'scene'), ('营销创意', '待命名',     'scene'),
 ]
-BASE4 = {'数据官':1,'知识官':1,'组织协同':1,'任务执行':1}
-MATRIX_ROWS = [
-    ('行业销售','行业 GM',   dict(BASE4)),
-    ('竞对对比','行业 GM',   dict(BASE4, **{'竞对情报':2,'外部咨询':2})),
-    ('行业损益','行业 GM',   dict(BASE4, **{'财务官':2})),
-    ('行业用户','行业 GM',   dict(BASE4, **{'用户增长':2})),
-    ('品类规划','品类组长',  dict(BASE4, **{'品类洞察':2,'外部咨询':2})),
-    ('商家复盘','品类小二',  dict(BASE4, **{'品类洞察':2,'财务官':2})),
-    ('新商新品','品类组长',  dict(BASE4, **{'品类洞察':2,'外部咨询':2})),
-    ('行业营销','营销小二',  {'数据官':2,'知识官':2,'组织协同':2,'任务执行':2,'营销创意':2,'用户增长':2}),
-]
+# 来自勾选页的实际配置
+PICKS = {
+    '行业销售': ['组织协同','任务执行','数据官','知识官'],
+    '竞对对比': ['组织协同','任务执行','数据官','知识官','竞对情报','品类洞察'],
+    '行业损益': ['组织协同','任务执行','数据官','财务官'],
+    '行业用户': ['组织协同','任务执行','数据官','知识官','用户增长'],
+    '品类规划': ['组织协同','任务执行','数据官','知识官','竞对情报','外部咨询','品类洞察'],
+    '商家复盘': ['组织协同','任务执行','数据官','知识官','竞对情报','财务官','用户增长','品类洞察'],
+    '新商新品': ['组织协同','任务执行','数据官','知识官'],
+    '行业营销': ['组织协同','任务执行','知识官','营销创意','用户增长','品类洞察'],
+}
+OWNERS = {'行业销售':'行业 GM','竞对对比':'行业 GM','行业损益':'行业 GM','行业用户':'行业 GM',
+          'x品类规划':'', '品类规划':'品类组长','商家复盘':'品类小二','新商新品':'品类组长','行业营销':'营销小二'}
+MATRIX_ROWS = [(sc, OWNERS[sc], {e: 1 for e in PICKS[sc]}) for sc in PICKS]
+REUSE = {fn: sum(1 for sc in PICKS if fn in PICKS[sc]) for fn, _c, _k in EXPERT_COLS}
+FILLED = sum(len(v) for v in PICKS.values())
+AVG = round(FILLED / len(EXPERT_COLS), 1)
 
 MATRIX_CSS = """
   .deck-mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
@@ -337,16 +343,20 @@ MATRIX_CSS = """
   .mx-r b{font-size:15px;font-weight:700}
   .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
              border-radius:999px;padding:1px 8px;align-self:flex-start}
-  .mx-c{display:flex;align-items:center;justify-content:center;min-height:73px;
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:68px;
       border-bottom:1px solid rgba(167,139,250,.13)}
   .mx-c.base{background:rgba(139,92,246,.10)}
   .m{width:22px;height:22px;border-radius:7px;display:block;
      background:linear-gradient(180deg,#9D55FF,#7A28E8);
      box-shadow:0 3px 10px rgba(74,20,140,.45),inset 0 1px 0 rgba(255,255,255,.28)}
   .m.t{background:none;border:1px dashed rgba(167,139,250,.62);box-shadow:none}
+  .mx-c.ft,.mx-r.ft{border-bottom:none;min-height:46px}
+  .mx-c.ft{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:15px;font-weight:700;color:#C6B4F5}
+  .mx-c.ft.base{border-radius:0 0 9px 9px}
+  .mx-r.ft{justify-content:center;font-size:11px;color:#9C8CCB;letter-spacing:.06em;padding-top:4px}
   .mx-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:16px;
            padding-top:14px;border-top:1px solid rgba(167,139,250,.26)}
-  .take{font-size:14.5px;color:#F6F2FF;line-height:1.6;max-width:1180px}
+  .take{font-size:14.5px;color:#F6F2FF;line-height:1.6;max-width:1240px;text-wrap:pretty}
   .take em{font-style:normal;color:#C08BFF;font-weight:700}
   .mlegend{display:flex;gap:18px;align-items:center;font-size:11.5px;color:#9C8CCB;white-space:nowrap}
   .mlegend span{display:flex;align-items:center;gap:7px}
@@ -366,17 +376,21 @@ def matrix_body():
             v = marks.get(name)
             mark = '' if not v else f'<i class="m{"" if v == 1 else " t"}"></i>'
             cells.append(f'<div class="mx-c {kind}">{mark}</div>')
+    cells.append('<div class="mx-r ft">被几个作战中心复用</div>')
+    for name, _, kind in EXPERT_COLS:
+        cells.append(f'<div class="mx-c ft {kind}">{REUSE[name]}</div>')
     return f"""<div class="stage">
 <header class="deck-mast">
   <div class="brand">{MARK}<div><h1>场景 × 专家团 能力矩阵</h1>
     <p class="claim">同一组专家反复复用在 8 个作战中心上——不是 8 套烟囱，是 1 套能力</p></div></div>
-  <div class="mlegend"><span><i></i>已确认</span><span><i class="t"></i>待确认</span></div>
+  <div class="mlegend"><span><i></i>该场景配置了这位专家，空格为不配置</span></div>
 </header>
 <div class="mx">{''.join(cells)}</div>
 <div class="mx-foot">
-  <div><p class="take">7 个作战中心复用<em>同一组 4 个基础专家</em>（数据官 · 知识官 · 组织协同 · 任务执行），
-    场景之间的差异只在外圈加 <em>1–2 个专属专家</em>。新增一个作战中心，绝大部分能力是现成的。</p>
-    <p class="note">虚线格为待确认：外圈专家的场景归属、以及行业营销一行的专家组合，需要按实际情况核对。</p></div>
+  <div><p class="take">8 个作战中心、{FILLED} 个配置，全部由 <em>10 个专家</em>承担——
+    平均每个专家被 <em>{AVG} 个场景复用</em>；组织协同、任务执行 8 场景全覆盖。
+    新增一个作战中心，平均只要补 <em>1–2 个专属专家</em>。</p>
+    <p class="note">底色四列为基础专家；空格表示该场景暂不配置该专家。</p></div>
 </div>
 </div>"""
 
