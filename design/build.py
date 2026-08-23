@@ -301,22 +301,22 @@ RAIL_BODY = f"""<div class="stage">
 # ==================================================== 汇报页 A — 能力复用矩阵
 # 1 = 已确认（用户提供）, 2 = 推测待确认
 EXPERT_COLS = [
-    ('数据','陈景润','base'), ('信息','藏书阁','base'),
-    ('协同','秘书处','base'), ('执行','王进喜','base'),
-    ('竞对','猫头鹰','scene'), ('财务','葛朗台','scene'),
-    ('外部咨询','新增','scene'), ('营销创意','新增','scene'),
-    ('用户增长','新增','scene'), ('品类洞察','新增','scene'),
+    ('数据官','行业陈景润','base'), ('知识官','行业藏书阁','base'),
+    ('组织协同','行业秘书处','base'), ('任务执行','行业王进喜','base'),
+    ('竞对情报','行业猫头鹰','scene'), ('财务官','行业葛朗台','scene'),
+    ('外部咨询','待命名','scene'), ('营销创意','待命名','scene'),
+    ('用户增长','待命名','scene'), ('品类洞察','待命名','scene'),
 ]
-BASE4 = {'数据':1,'信息':1,'协同':1,'执行':1}
+BASE4 = {'数据官':1,'知识官':1,'组织协同':1,'任务执行':1}
 MATRIX_ROWS = [
     ('行业销售','行业 GM',   dict(BASE4)),
-    ('竞对对比','行业 GM',   dict(BASE4, **{'竞对':2,'外部咨询':2})),
-    ('行业损益','行业 GM',   dict(BASE4, **{'财务':2})),
+    ('竞对对比','行业 GM',   dict(BASE4, **{'竞对情报':2,'外部咨询':2})),
+    ('行业损益','行业 GM',   dict(BASE4, **{'财务官':2})),
     ('行业用户','行业 GM',   dict(BASE4, **{'用户增长':2})),
     ('品类规划','品类组长',  dict(BASE4, **{'品类洞察':2,'外部咨询':2})),
-    ('商家复盘','品类小二',  dict(BASE4, **{'品类洞察':2,'财务':2})),
+    ('商家复盘','品类小二',  dict(BASE4, **{'品类洞察':2,'财务官':2})),
     ('新商新品','品类组长',  dict(BASE4, **{'品类洞察':2,'外部咨询':2})),
-    ('行业营销','营销小二',  {'数据':2,'信息':2,'协同':2,'执行':2,'营销创意':2,'用户增长':2}),
+    ('行业营销','营销小二',  {'数据官':2,'知识官':2,'组织协同':2,'任务执行':2,'营销创意':2,'用户增长':2}),
 ]
 
 MATRIX_CSS = """
@@ -327,7 +327,7 @@ MATRIX_CSS = """
   .mx{display:grid;grid-template-columns:236px repeat(10,1fr);gap:0 6px;align-items:stretch}
   .mx-h{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;
         padding:0 4px 9px;text-align:center;border-bottom:1px solid rgba(167,139,250,.26)}
-  .mx-h b{font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .mx-h b{font-size:12.5px;font-weight:700;letter-spacing:.01em;white-space:nowrap}
   .mx-h span{font-size:9.5px;color:#9C8CCB;letter-spacing:.04em}
   .mx-h.base{background:rgba(139,92,246,.10);border-radius:9px 9px 0 0}
   .mx-h.corner{border-bottom:1px solid rgba(167,139,250,.26);align-items:flex-start;padding-left:2px}
@@ -374,7 +374,7 @@ def matrix_body():
 </header>
 <div class="mx">{''.join(cells)}</div>
 <div class="mx-foot">
-  <div><p class="take">7 个作战中心复用<em>同一组 4 个基础专家</em>（数据 · 信息 · 协同 · 执行），
+  <div><p class="take">7 个作战中心复用<em>同一组 4 个基础专家</em>（数据官 · 知识官 · 组织协同 · 任务执行），
     场景之间的差异只在外圈加 <em>1–2 个专属专家</em>。新增一个作战中心，绝大部分能力是现成的。</p>
     <p class="note">虚线格为待确认：外圈专家的场景归属、以及行业营销一行的专家组合，需要按实际情况核对。</p></div>
 </div>
