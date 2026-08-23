@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+  <style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0C0918;color:#F6F2FF;font-family:'Sora','Noto Sans SC',system-ui,sans-serif;
+       font-weight:500;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:#C6B4F5}a:hover{color:#E6DBFF}
+  .wrap{padding:38px 40px}
+  .mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+        padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .brand{display:flex;align-items:center;gap:14px}
+  h1{font-size:30px;font-weight:700;letter-spacing:.01em}
+  .tag{margin-top:4px;font-size:12.5px;color:#9C8CCB;letter-spacing:.04em}
+  .legend{display:flex;gap:16px;font-size:11.5px;color:#9C8CCB}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .key{width:20px;height:11px;border-radius:4px;display:block;
+       background:linear-gradient(180deg,#9D55FF,#7A28E8)}
+  .key.g{background:rgba(167,139,250,.09);border:1px dashed rgba(167,139,250,.5)}
+  .head{display:flex;align-items:baseline;gap:11px;margin-bottom:13px}
+  h2{font-size:18px;font-weight:700;letter-spacing:.02em}
+  .tier{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;color:#C6B4F5;
+        border:1px solid rgba(167,139,250,.5);border-radius:6px;padding:2px 7px;flex:none}
+  .sub{font-size:12px;color:#9C8CCB}
+  .cnt{margin-left:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#9C8CCB}
+  .grid{display:grid;gap:10px}
+  .chip{border-radius:11px;padding:12px 14px;background:linear-gradient(180deg,#9D55FF,#7A28E8);
+        border:1px solid rgba(255,255,255,.16);
+        box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24)}
+  .chip b{display:block;font-size:14.5px;font-weight:700}
+  .chip i{display:block;font-style:normal;font-size:11.5px;color:rgba(255,255,255,.74);margin-top:2px}
+  .chip.g{background:rgba(167,139,250,.09);border:1px dashed rgba(167,139,250,.5);box-shadow:none}
+  .chip.g b{color:#C6B4F5}.chip.g i{color:#9C8CCB}
+  .mono b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;font-weight:500}
+  .panel{border:1px dashed rgba(167,139,250,.26);border-radius:15px;
+         background:rgba(139,92,246,.045);padding:16px 18px 18px}
+  .kbcard{border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:7px;
+          background:linear-gradient(180deg,#6D28D9,#45178F);border:1px solid rgba(196,181,253,.24);
+          box-shadow:0 6px 16px rgba(40,12,90,.42),inset 0 1px 0 rgba(255,255,255,.16)}
+  .kbtop{display:flex;align-items:center;gap:9px}
+  .kbcard b{font-size:15px;font-weight:700}
+  .kbcard p{font-size:11.5px;line-height:1.6;color:rgba(255,255,255,.78)}
+  .idx{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:#DCCEFF;
+       border:1px solid rgba(220,206,255,.4);border-radius:5px;padding:2px 6px;flex:none}
+  .arrow{display:flex;align-items:center;justify-content:center;gap:9px;color:#C6B4F5;height:26px}
+  .arrow span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
+
+  .rail{display:grid;grid-template-columns:1fr 54px 1fr 54px 1fr 54px 1fr;align-items:start}
+  .col{display:flex;flex-direction:column;padding:14px 14px 15px}
+  .col .head{margin-bottom:11px}
+  .col h2{font-size:15.5px}
+  .duo{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;align-content:start;flex:1}
+  .duo .chip{padding:8px 10px;border-radius:9px}
+  .duo .chip b{font-size:13px}
+  .duo .chip i{font-size:10.5px;margin-top:1px}
+  .rcell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+         align-self:center;min-height:170px}
+  .rcell span{font-size:10px;color:#9C8CCB;letter-spacing:.08em}
+  .kbbase{margin-top:18px;border:1px solid rgba(167,139,250,.5);border-radius:15px;
+          background:rgba(139,92,246,.075);padding:14px 18px 16px}
+  .kbrow{grid-template-columns:repeat(3,1fr)}
+  .kbbase .kbcard{padding:12px 14px}
+  .kbbase .kbcard p{font-size:11px}
+</style>
+</helmet>
+<div class="wrap">
+<div class="mast">
+  <div class="brand"><svg width="38" height="38" viewBox="0 0 44 44" fill="none"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>TMG保健行业A-H平台</h1><p class="tag">以三层知识库为底座，叠加岗位 Agent 能力，把行业运营的工作做得更好</p></div></div>
+  <div class="legend"><span><i class="key"></i>已定义</span><span><i class="key g"></i>扩展位</span></div>
+</div>
+<div class="rail">
+  <section class="col panel"><div class="head"><span class="tier">01</span><h2>工作场景</h2></div><div class="duo"><div class="chip"><b>行业销售</b><i>作战中心</i></div><div class="chip"><b>竞对对比</b><i>作战中心</i></div><div class="chip"><b>行业损益</b><i>作战中心</i></div><div class="chip"><b>行业用户</b><i>作战中心</i></div><div class="chip"><b>品类规划</b><i>作战中心</i></div><div class="chip"><b>商家复盘</b><i>作战中心</i></div><div class="chip"><b>新商新品</b><i>作战中心</i></div><div class="chip"><b>行业营销</b><i>作战中心</i></div></div><div class="cnt" style="margin:10px 0 0">8 个作战中心</div></section>
+  <div class="rcell"><span>承接</span><svg width="26" height="9" viewBox="0 0 26 9" fill="none"><path d="M0 4.5H20" stroke="#C6B4F5" stroke-width="1.1"/><path d="M19 1L25 4.5L19 8Z" fill="#C6B4F5"/></svg></div>
+  <section class="col panel"><div class="head"><span class="tier">02</span><h2>岗位 Agent</h2></div><div class="duo"><div class="chip"><b>行业 GM</b></div><div class="chip"><b>品类组长</b></div><div class="chip"><b>渠道组长</b></div><div class="chip"><b>品类小二</b></div><div class="chip"><b>渠道小二</b></div><div class="chip"><b>用户小二</b></div><div class="chip"><b>营销小二</b></div><div class="chip g"><b>岗位 X…</b></div></div><div class="cnt" style="margin:10px 0 0">7 个岗位 · 1 个扩展位</div></section>
+  <div class="rcell"><span>拆解</span><svg width="26" height="9" viewBox="0 0 26 9" fill="none"><path d="M0 4.5H20" stroke="#C6B4F5" stroke-width="1.1"/><path d="M19 1L25 4.5L19 8Z" fill="#C6B4F5"/></svg></div>
+  <section class="col panel"><div class="head"><span class="tier">03</span><h2>场景运营专家团</h2></div><div class="duo"><div class="chip"><b>行业陈景润</b><i>数据官</i></div><div class="chip"><b>行业藏书阁</b><i>知识库</i></div><div class="chip"><b>行业猫头鹰</b><i>监视竞对</i></div><div class="chip"><b>行业葛朗台</b><i>财务官</i></div><div class="chip"><b>行业秘书处</b><i>组织协同</i></div><div class="chip"><b>行业王进喜</b><i>任务执行</i></div><div class="chip g"><b>等等…</b><i>按场景扩充</i></div></div><div class="cnt" style="margin:10px 0 0">6 位专家 · 1 个扩展位</div></section>
+  <div class="rcell"><span>配置</span><svg width="26" height="9" viewBox="0 0 26 9" fill="none"><path d="M0 4.5H20" stroke="#C6B4F5" stroke-width="1.1"/><path d="M19 1L25 4.5L19 8Z" fill="#C6B4F5"/></svg></div>
+  <section class="col panel"><div class="head"><span class="tier">04</span><h2>Skill 配置</h2></div><div class="duo"><div class="chip mono"><b>target-data</b><i>销售追踪</i></div><div class="chip mono"><b>Kbsearch-tmg</b><i>知识调用</i></div><div class="chip mono"><b>cmr-tmg</b><i>损益管理</i></div><div class="chip mono"><b>AI-data-qd</b><i>渠道取数</i></div><div class="chip mono"><b>AI-data-pl</b><i>品类取数</i></div><div class="chip mono"><b>Renwu-bj</b><i>任务找人</i></div><div class="chip mono"><b>Zhenduan</b><i>明确任务</i></div><div class="chip g mono"><b>Skill 1</b><i>xxx</i></div><div class="chip g mono"><b>Skill 2</b><i>xxx</i></div><div class="chip g mono"><b>Skill 3</b><i>xxx</i></div><div class="chip g mono"><b>Skill 4</b><i>xxx</i></div><div class="chip g mono"><b>Skill 5</b><i>xxx</i></div></div><div class="cnt" style="margin:10px 0 0">7 个 Skill · 5 个扩展位</div></section>
+</div>
+<section class="kbbase">
+  <div class="head"><span class="tier">KB</span><h2>三层知识库</h2><span class="sub">平台知识底座，服务上面四列全部内容</span><span class="cnt">行业 → 岗位 → 个人</span></div>
+  <div class="grid kbrow"><div class="kbcard"><div class="kbtop"><span class="idx">L1</span><b>行业知识库</b></div><p>行业的通用信息，以对商文档为主</p></div><div class="kbcard"><div class="kbtop"><span class="idx">L2</span><b>岗位知识库</b></div><p>行业的政策、资源扶持等核心内容</p></div><div class="kbcard"><div class="kbtop"><span class="idx">L3</span><b>个人记忆画像</b></div><p>对应岗位的行业经验、商家判断、运营习惯等和个人意识相关的信息，由 Agent 使用中沉淀回流</p></div></div>
+</section>
+</div>
+</x-dc>
+</body>
+</html>
