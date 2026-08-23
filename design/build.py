@@ -297,21 +297,231 @@ RAIL_BODY = f"""<div class="stage">
 </div>"""
 (CANVAS/'Rail.dc.html').write_text(dc(RAIL_CSS, RAIL_BODY), encoding='utf-8')
 
+
+# ==================================================== 汇报页 A — 能力复用矩阵
+# 1 = 已确认（用户提供）, 2 = 推测待确认
+EXPERT_COLS = [
+    ('数据','陈景润','base'), ('信息','藏书阁','base'),
+    ('协同','秘书处','base'), ('执行','王进喜','base'),
+    ('竞对','猫头鹰','scene'), ('财务','葛朗台','scene'),
+    ('外部咨询','新增','scene'), ('营销创意','新增','scene'),
+    ('用户增长','新增','scene'), ('品类洞察','新增','scene'),
+]
+BASE4 = {'数据':1,'信息':1,'协同':1,'执行':1}
+MATRIX_ROWS = [
+    ('行业销售','行业 GM',   dict(BASE4)),
+    ('竞对对比','行业 GM',   dict(BASE4, **{'竞对':2,'外部咨询':2})),
+    ('行业损益','行业 GM',   dict(BASE4, **{'财务':2})),
+    ('行业用户','行业 GM',   dict(BASE4, **{'用户增长':2})),
+    ('品类规划','品类组长',  dict(BASE4, **{'品类洞察':2,'外部咨询':2})),
+    ('商家复盘','品类小二',  dict(BASE4, **{'品类洞察':2,'财务':2})),
+    ('新商新品','品类组长',  dict(BASE4, **{'品类洞察':2,'外部咨询':2})),
+    ('行业营销','营销小二',  {'数据':2,'信息':2,'协同':2,'执行':2,'营销创意':2,'用户增长':2}),
+]
+
+MATRIX_CSS = """
+  .deck-mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+             padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .deck-mast h1{font-size:26px}
+  .claim{margin-top:6px;font-size:14px;color:#D9CCFF;letter-spacing:.02em}
+  .mx{display:grid;grid-template-columns:236px repeat(10,1fr);gap:0 6px;align-items:stretch}
+  .mx-h{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;
+        padding:0 4px 9px;text-align:center;border-bottom:1px solid rgba(167,139,250,.26)}
+  .mx-h b{font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .mx-h span{font-size:9.5px;color:#9C8CCB;letter-spacing:.04em}
+  .mx-h.base{background:rgba(139,92,246,.10);border-radius:9px 9px 0 0}
+  .mx-h.corner{border-bottom:1px solid rgba(167,139,250,.26);align-items:flex-start;padding-left:2px}
+  .mx-h.corner b{font-size:11px;color:#9C8CCB;font-weight:500;letter-spacing:.1em}
+  .mx-r{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 10px 0 2px;
+       border-bottom:1px solid rgba(167,139,250,.13)}
+  .mx-r b{font-size:15px;font-weight:700}
+  .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
+             border-radius:999px;padding:1px 8px;align-self:flex-start}
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:73px;
+      border-bottom:1px solid rgba(167,139,250,.13)}
+  .mx-c.base{background:rgba(139,92,246,.10)}
+  .m{width:22px;height:22px;border-radius:7px;display:block;
+     background:linear-gradient(180deg,#9D55FF,#7A28E8);
+     box-shadow:0 3px 10px rgba(74,20,140,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+  .m.t{background:none;border:1px dashed rgba(167,139,250,.62);box-shadow:none}
+  .mx-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:16px;
+           padding-top:14px;border-top:1px solid rgba(167,139,250,.26)}
+  .take{font-size:14.5px;color:#F6F2FF;line-height:1.6;max-width:1180px}
+  .take em{font-style:normal;color:#C08BFF;font-weight:700}
+  .mlegend{display:flex;gap:18px;align-items:center;font-size:11.5px;color:#9C8CCB;white-space:nowrap}
+  .mlegend span{display:flex;align-items:center;gap:7px}
+  .mlegend i{width:16px;height:16px;border-radius:5px;display:block;
+             background:linear-gradient(180deg,#9D55FF,#7A28E8)}
+  .mlegend i.t{background:none;border:1px dashed rgba(167,139,250,.62)}
+  .note{margin-top:9px;font-size:11.5px;color:#9C8CCB}
+"""
+
+def matrix_body():
+    cells = ['<div class="mx-h corner"><b>作战中心 / 主导岗位</b></div>']
+    for name, nick, kind in EXPERT_COLS:
+        cells.append(f'<div class="mx-h {kind}"><b>{name}</b><span>{nick}</span></div>')
+    for scene, owner, marks in MATRIX_ROWS:
+        cells.append(f'<div class="mx-r"><b>{scene}</b><span>{owner} 主导</span></div>')
+        for name, _, kind in EXPERT_COLS:
+            v = marks.get(name)
+            mark = '' if not v else f'<i class="m{"" if v == 1 else " t"}"></i>'
+            cells.append(f'<div class="mx-c {kind}">{mark}</div>')
+    return f"""<div class="stage">
+<header class="deck-mast">
+  <div class="brand">{MARK}<div><h1>场景 × 专家团 能力矩阵</h1>
+    <p class="claim">同一组专家反复复用在 8 个作战中心上——不是 8 套烟囱，是 1 套能力</p></div></div>
+  <div class="mlegend"><span><i></i>已确认</span><span><i class="t"></i>待确认</span></div>
+</header>
+<div class="mx">{''.join(cells)}</div>
+<div class="mx-foot">
+  <div><p class="take">7 个作战中心复用<em>同一组 4 个基础专家</em>（数据 · 信息 · 协同 · 执行），
+    场景之间的差异只在外圈加 <em>1–2 个专属专家</em>。新增一个作战中心，绝大部分能力是现成的。</p>
+    <p class="note">虚线格为待确认：外圈专家的场景归属、以及行业营销一行的专家组合，需要按实际情况核对。</p></div>
+</div>
+</div>"""
+
+MATRIX_BODY = matrix_body()
+(ROOT/'tmg-matrix.html').write_text(
+    f'<title>场景 × 专家团 能力矩阵</title>\n<style>\n/*@FONTS@*/\n{CSS}{MATRIX_CSS}</style>\n\n{MATRIX_BODY}\n',
+    encoding='utf-8')
+(CANVAS/'Matrix.dc.html').write_text(dc(MATRIX_CSS, MATRIX_BODY), encoding='utf-8')
+
+# ============================================ 汇报页 B — 行业销售端到端
+TODAY = ['BI 按历史出目标','人工每日盯盘','逐级同步数据与风险','拉会一起补缺口',
+         '人工翻可用资源','人工写商家建议','商家执行']
+LEVELS = [
+    ('L1','行业 GM Agent','看行业整体达成与缺口，把目标按品类 / 渠道拆成任务',
+     ['target-data'], 'A2A 派单', ''),
+    ('L2','品类组长 Agent · 渠道组长 Agent','接到任务自动下钻，定位问题品类与问题渠道，找出小二级的机会',
+     ['AI-data-pl','AI-data-qd'], 'A2A 派单', ''),
+    ('L3','品类小二 Agent · 渠道小二 Agent','下钻到商家 × 渠道，结合知识库找出可给的政策与资源',
+     ['AI-data-pl','AI-data-qd','Kbsearch-tmg','Zhenduan'], '生成动作', 'kb'),
+    ('L4','商家 × 渠道 运营动作','每个商家一套具体动作建议，AI 直接触达商家',
+     ['Renwu-bj'], '', 'out'),
+]
+
+FLOW_CSS = """
+  .deck-mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+             padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .deck-mast h1{font-size:26px}
+  .claim{margin-top:6px;font-size:14px;color:#D9CCFF}
+  .today{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+         border:1px dashed rgba(180,150,120,.32);border-radius:13px;padding:12px 14px;margin-bottom:16px;
+         background:rgba(120,90,60,.07)}
+  .today .lb{font-size:11.5px;color:#D8A657;letter-spacing:.1em;font-weight:700;flex:none}
+  .today .st{font-size:11.5px;color:#BCAF9E;background:rgba(255,255,255,.045);
+             border:1px solid rgba(180,150,120,.22);border-radius:7px;padding:5px 9px;white-space:nowrap}
+  .today .sep{color:#7A6A55;font-size:11px}
+  .today .pain{margin-left:auto;font-size:11.5px;color:#D8A657;white-space:nowrap}
+  .casc{display:flex;align-items:stretch;gap:10px}
+  .rail{position:relative;width:32px;flex:none}
+  .rail:before{content:'';position:absolute;left:50%;top:0;bottom:6px;width:1px;
+               background:repeating-linear-gradient(180deg,rgba(167,139,250,.5) 0 5px,transparent 5px 10px)}
+  .rail:after{content:'';position:absolute;top:-1px;left:calc(50% - 4.5px);width:0;height:0;
+              border-left:4.5px solid transparent;border-right:4.5px solid transparent;
+              border-bottom:8px solid rgba(167,139,250,.6)}
+  .rail span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);writing-mode:vertical-rl;
+             font-size:10.5px;color:#9C8CCB;letter-spacing:.12em;white-space:nowrap;
+             background:#0C0918;padding:10px 0}
+  .cbody{flex:1;display:grid;grid-template-columns:46px 1fr;gap:0 10px;align-content:start}
+  .bdg{display:flex;align-items:center;justify-content:center;
+       font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#C6B4F5;
+       border:1px solid rgba(167,139,250,.5);border-radius:8px;height:34px;align-self:center}
+  .lv{border:1px solid rgba(167,139,250,.3);border-radius:13px;background:rgba(139,92,246,.06);
+      padding:21px 16px;display:grid;grid-template-columns:1fr 300px 78px;gap:14px;align-items:center}
+  .lv b{font-size:15.5px;font-weight:700;display:block}
+  .lv p{font-size:13px;color:#C6B4F5;margin-top:4px;line-height:1.55}
+  .kbnote{margin-top:9px;font-size:11.5px;color:#C7CCFF;border-left:2px solid rgba(129,140,248,.65);
+          padding:2px 0 2px 9px;letter-spacing:.02em}
+  .lv.out{border-color:rgba(196,141,255,.55);background:linear-gradient(180deg,rgba(157,85,255,.20),rgba(122,40,232,.12))}
+  .lv.kb{border-color:rgba(129,140,248,.45)}
+  .sk{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+  .sk i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;
+        color:#E4D8FF;background:rgba(139,63,243,.30);border:1px solid rgba(167,139,250,.34);
+        border-radius:6px;padding:4px 8px}
+  .sk i.kbs{background:rgba(76,65,201,.42);border-color:rgba(165,180,252,.45);color:#DDE2FF}
+  .a2a{display:flex;align-items:center;gap:9px;height:30px;padding-left:2px;color:#C6B4F5}
+  .a2a span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
+  .hitl{font-size:10.5px;color:#C6B4F5;border:1px dashed rgba(167,139,250,.5);border-radius:999px;
+        padding:4px 0;text-align:center;letter-spacing:.04em}
+  .gain{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:12px;margin-top:18px}
+  .gcard{border:1px solid rgba(167,139,250,.34);border-radius:13px;padding:17px 18px;
+         background:rgba(139,92,246,.07)}
+  .gcard .k{font-size:11px;color:#9C8CCB;letter-spacing:.08em}
+  .gcard .v{display:flex;align-items:baseline;gap:10px;margin-top:5px}
+  .gcard .was{font-size:14px;color:#8E7FBF;text-decoration:line-through}
+  .gcard .now{font-size:23px;font-weight:700;color:#F6F2FF;letter-spacing:.01em}
+  .gcard .x{font-size:12px;color:#C08BFF;font-weight:700}
+  .gcard.qual .v{margin-top:7px}
+  .gcard.qual .now{font-size:16px;line-height:1.5}
+"""
+
+def flow_body():
+    today = ''.join(
+        (f'<span class="st">{s}</span>' + ('<span class="sep">→</span>' if i < len(TODAY)-1 else ''))
+        for i, s in enumerate(TODAY))
+    rows = []
+    for tag, name, desc, skills, arrow, kind in LEVELS:
+        sk = ''.join(f'<i class="{"kbs" if k == "Kbsearch-tmg" else ""}">{k}</i>' for k in skills)
+        hitl = '' if kind == 'out' else '<span class="hitl">人确认</span>'
+        kbn = ('<div class="kbnote">三层知识库注入 · 行业政策 / 资源扶持 / 商家档案</div>'
+               if kind == 'kb' else '')
+        rows.append(f'<div class="bdg">{tag}</div>'
+                    f'<div class="lv {kind}"><div><b>{name}</b><p>{desc}</p>{kbn}</div>'
+                    f'<div class="sk">{sk}</div>{hitl or "<span></span>"}</div>')
+        if arrow:
+            rows.append('<div></div><div class="a2a">'
+                        '<svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true">'
+                        '<path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/>'
+                        '<path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg>'
+                        f'<span>{arrow}</span></div>')
+    return f"""<div class="stage">
+<header class="deck-mast">
+  <div class="brand">{MARK}<div><h1>行业销售作战中心 · 端到端跑通</h1>
+    <p class="claim">一个行业目标，逐级下钻到 100+ 个商家的当日动作</p></div></div>
+  <div class="mlegend"><span>每一级派单后，Agent 先出结论与建议，人确认或与 Agent 对话调整</span></div>
+</header>
+<div class="today"><span class="lb">今天怎么干</span>{today}
+  <span class="pain">只有数字没有知识 · 靠人传话易遗漏 · 4 小时只覆盖 3–5 个头部商家</span></div>
+<div class="casc">
+  <div class="rail"><span>当日动作汇总回流 · 成为行业每日行动</span></div>
+  <div class="cbody">{''.join(rows)}</div>
+</div>
+<div class="gain">
+  <div class="gcard"><div class="k">单次跑完耗时</div>
+    <div class="v"><span class="was">4 小时</span><span class="now">1 小时</span><span class="x">÷4</span></div></div>
+  <div class="gcard"><div class="k">覆盖商家数</div>
+    <div class="v"><span class="was">3–5 个头部</span><span class="now">100+ 个核心</span><span class="x">×20+</span></div></div>
+  <div class="gcard qual"><div class="k">质变</div>
+    <div class="v"><span class="now">从「只有数字」到「数字 × 知识 × 动作」——抓手不再靠人传话，不遗漏、可复用到长尾商家</span></div></div>
+</div>
+</div>"""
+
+FLOW_BODY = flow_body()
+(ROOT/'tmg-sales-flow.html').write_text(
+    f'<title>行业销售作战中心 · 端到端</title>\n<style>\n/*@FONTS@*/\n{CSS}{MATRIX_CSS}{FLOW_CSS}</style>\n\n{FLOW_BODY}\n',
+    encoding='utf-8')
+(CANVAS/'SalesFlow.dc.html').write_text(dc(MATRIX_CSS + FLOW_CSS, FLOW_BODY), encoding='utf-8')
+
 canvas = {
- "pages":[{"id":"page-1","name":"最终版"},{"id":"page-2","name":"其它方向"}],
+ "pages":[{"id":"page-1","name":"汇报页"},{"id":"page-2","name":"其它排版方向"}],
  "artboards":[
-  {"file":"Main.dc.html","title":"最终版 · 双栏底座 16:9","page":"page-1","x":0,"y":0,"w":1600,"h":900},
+  {"file":"Main.dc.html","title":"P1 · 平台总架构","page":"page-1","x":0,"y":0,"w":1600,"h":900},
+  {"file":"Matrix.dc.html","title":"P2 · 场景 × 专家团 矩阵","page":"page-1","x":1760,"y":0,"w":1600,"h":900},
+  {"file":"SalesFlow.dc.html","title":"P3 · 行业销售端到端","page":"page-1","x":3520,"y":0,"w":1600,"h":900},
   {"file":"Enclosure.dc.html","title":"方向二 · 环抱式","page":"page-2","x":0,"y":0,"w":1600,"h":900},
   {"file":"Granularity.dc.html","title":"方向三 · 粒度阶梯","page":"page-2","x":1760,"y":0,"w":1600,"h":900},
   {"file":"Rail.dc.html","title":"方向四 · 横向流水线","page":"page-2","x":3520,"y":0,"w":1600,"h":830}
  ],
  "annotations":[
-  {"id":"note-final","page":"page-1","x":0,"y":-150,"w":460,
-   "text":"最终版：方向一的构图，锁 16:9（1600×900）。\\n知识库换成靛蓝，和紫色的能力层分成两种物质；层级数量标注已去掉；专家团补齐了扩展位。"},
-  {"id":"note-alts","page":"page-2","x":0,"y":-150,"w":460,
-   "text":"没有选中的三个方向，留作参考。"}
+  {"id":"note-p2","page":"page-1","x":1760,"y":-160,"w":520,
+   "text":"P2 矩阵里的虚线格是推断的，需要核对：外圈专家（竞对/财务/外部咨询/营销创意/用户增长/品类洞察）的场景归属，以及行业营销一整行。\\n另外后 4 个专家是新的，P1 主架构图上还没有。"},
+  {"id":"note-p3","page":"page-1","x":3520,"y":-160,"w":520,
+   "text":"P3 全部内容来自你给的链路描述，没有推断。"},
+  {"id":"note-alts","page":"page-2","x":0,"y":-120,"w":460,
+   "text":"没有选中的三个排版方向，留作参考。"}
  ],
  "launch":{"view":"canvas","page":"page-1"}
 }
 (CANVAS/'canvas.json').write_text(json.dumps(canvas, ensure_ascii=False, indent=1), encoding='utf-8')
-print('built:', ', '.join(sorted(p.name for p in CANVAS.iterdir())), '+ tmg-a-h-platform.html')
+print('built:', ', '.join(sorted(p.name for p in CANVAS.iterdir())))

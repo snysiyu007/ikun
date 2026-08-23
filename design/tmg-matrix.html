@@ -1,0 +1,108 @@
+<title>场景 × 专家团 能力矩阵</title>
+<style>
+/*@FONTS@*/
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0C0918;
+       background-image:radial-gradient(1200px 560px at 50% -10%,rgba(124,58,237,.22),transparent 70%),
+                        radial-gradient(900px 460px at 50% 112%,rgba(49,46,129,.28),transparent 72%);
+       background-attachment:fixed;color:#F6F2FF;
+       font-family:'Sora','Noto Sans SC',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+       font-weight:500;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:#C6B4F5}a:hover{color:#E6DBFF}
+  .stage{width:1600px;max-width:100%;margin:0 auto;padding:30px 40px}
+  .mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;
+        padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .brand{display:flex;align-items:center;gap:14px}
+  .mark{flex:none;width:38px;height:38px}
+  h1{font-size:28px;font-weight:700;letter-spacing:.01em;text-wrap:balance}
+  .tag{margin-top:4px;font-size:12.5px;color:#9C8CCB;letter-spacing:.04em}
+  .legend{display:flex;gap:16px;align-items:center;font-size:11.5px;color:#9C8CCB;letter-spacing:.04em}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .key{width:20px;height:11px;border-radius:4px;display:block;
+       background:linear-gradient(180deg,#9D55FF,#7A28E8)}
+  .key.g{background:rgba(167,139,250,.09);border:1px dashed rgba(167,139,250,.5)}
+  .panel{border:1px dashed rgba(167,139,250,.26);border-radius:15px;
+         background:rgba(139,92,246,.045);padding:12px 15px 14px}
+  .head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .tier{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;color:#C6B4F5;
+        border:1px solid rgba(167,139,250,.5);border-radius:6px;padding:2px 7px;flex:none}
+  h2{font-size:17px;font-weight:700;letter-spacing:.02em}
+  .sub{font-size:12px;color:#9C8CCB}
+  .grid{display:grid;gap:9px}
+  .chip{border-radius:11px;padding:10px 12px;background:linear-gradient(180deg,#9D55FF,#7A28E8);
+        border:1px solid rgba(255,255,255,.16);
+        box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24);
+        transition:transform .18s ease,box-shadow .18s ease}
+  .chip:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(74,20,140,.48),inset 0 1px 0 rgba(255,255,255,.3)}
+  .chip b{display:block;font-size:14.5px;font-weight:700}
+  .chip i{display:block;font-style:normal;font-size:11.5px;color:rgba(255,255,255,.74);margin-top:2px}
+  .chip.g{background:rgba(167,139,250,.09);border:1px dashed rgba(167,139,250,.5);box-shadow:none}
+  .chip.g b{color:#C6B4F5}.chip.g i{color:#9C8CCB}
+  .chip.g:hover{transform:none;box-shadow:none;background:rgba(167,139,250,.14)}
+  .mono b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;font-weight:500}
+  .arrow{display:flex;align-items:center;justify-content:center;gap:9px;height:18px;color:#C6B4F5}
+  .arrow span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
+  .kb{margin-top:14px;border:1px solid rgba(129,140,248,.45);border-radius:15px;
+      background:rgba(67,56,202,.13);padding:12px 15px 14px}
+  .kb .tier{color:#C7CCFF;border-color:rgba(165,180,252,.5)}
+  .kb .grid{grid-template-columns:1fr 1fr 1.32fr;gap:12px}
+  .kbcard{border-radius:11px;padding:11px 14px;display:flex;flex-direction:column;gap:6px;
+          background:linear-gradient(180deg,#4C41C9,#2C2480);border:1px solid rgba(199,210,254,.26);
+          box-shadow:0 6px 16px rgba(23,18,80,.5),inset 0 1px 0 rgba(255,255,255,.16)}
+  .kbtop{display:flex;align-items:center;gap:9px}
+  .kbcard b{font-size:15px;font-weight:700}
+  .kbcard p{font-size:11.5px;line-height:1.6;color:rgba(255,255,255,.8)}
+  .idx{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:#D8DCFF;
+       border:1px solid rgba(216,220,255,.42);border-radius:5px;padding:2px 6px;flex:none}
+  @media (prefers-reduced-motion:reduce){.chip{transition:none}.chip:hover{transform:none}}
+
+  .deck-mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+             padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .deck-mast h1{font-size:26px}
+  .claim{margin-top:6px;font-size:14px;color:#D9CCFF;letter-spacing:.02em}
+  .mx{display:grid;grid-template-columns:236px repeat(10,1fr);gap:0 6px;align-items:stretch}
+  .mx-h{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;
+        padding:0 4px 9px;text-align:center;border-bottom:1px solid rgba(167,139,250,.26)}
+  .mx-h b{font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .mx-h span{font-size:9.5px;color:#9C8CCB;letter-spacing:.04em}
+  .mx-h.base{background:rgba(139,92,246,.10);border-radius:9px 9px 0 0}
+  .mx-h.corner{border-bottom:1px solid rgba(167,139,250,.26);align-items:flex-start;padding-left:2px}
+  .mx-h.corner b{font-size:11px;color:#9C8CCB;font-weight:500;letter-spacing:.1em}
+  .mx-r{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 10px 0 2px;
+       border-bottom:1px solid rgba(167,139,250,.13)}
+  .mx-r b{font-size:15px;font-weight:700}
+  .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
+             border-radius:999px;padding:1px 8px;align-self:flex-start}
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:73px;
+      border-bottom:1px solid rgba(167,139,250,.13)}
+  .mx-c.base{background:rgba(139,92,246,.10)}
+  .m{width:22px;height:22px;border-radius:7px;display:block;
+     background:linear-gradient(180deg,#9D55FF,#7A28E8);
+     box-shadow:0 3px 10px rgba(74,20,140,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+  .m.t{background:none;border:1px dashed rgba(167,139,250,.62);box-shadow:none}
+  .mx-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:16px;
+           padding-top:14px;border-top:1px solid rgba(167,139,250,.26)}
+  .take{font-size:14.5px;color:#F6F2FF;line-height:1.6;max-width:1180px}
+  .take em{font-style:normal;color:#C08BFF;font-weight:700}
+  .mlegend{display:flex;gap:18px;align-items:center;font-size:11.5px;color:#9C8CCB;white-space:nowrap}
+  .mlegend span{display:flex;align-items:center;gap:7px}
+  .mlegend i{width:16px;height:16px;border-radius:5px;display:block;
+             background:linear-gradient(180deg,#9D55FF,#7A28E8)}
+  .mlegend i.t{background:none;border:1px dashed rgba(167,139,250,.62)}
+  .note{margin-top:9px;font-size:11.5px;color:#9C8CCB}
+</style>
+
+<div class="stage">
+<header class="deck-mast">
+  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>场景 × 专家团 能力矩阵</h1>
+    <p class="claim">同一组专家反复复用在 8 个作战中心上——不是 8 套烟囱，是 1 套能力</p></div></div>
+  <div class="mlegend"><span><i></i>已确认</span><span><i class="t"></i>待确认</span></div>
+</header>
+<div class="mx"><div class="mx-h corner"><b>作战中心 / 主导岗位</b></div><div class="mx-h base"><b>数据</b><span>陈景润</span></div><div class="mx-h base"><b>信息</b><span>藏书阁</span></div><div class="mx-h base"><b>协同</b><span>秘书处</span></div><div class="mx-h base"><b>执行</b><span>王进喜</span></div><div class="mx-h scene"><b>竞对</b><span>猫头鹰</span></div><div class="mx-h scene"><b>财务</b><span>葛朗台</span></div><div class="mx-h scene"><b>外部咨询</b><span>新增</span></div><div class="mx-h scene"><b>营销创意</b><span>新增</span></div><div class="mx-h scene"><b>用户增长</b><span>新增</span></div><div class="mx-h scene"><b>品类洞察</b><span>新增</span></div><div class="mx-r"><b>行业销售</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>竞对对比</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>行业损益</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>行业用户</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-r"><b>品类规划</b><span>品类组长 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-r"><b>商家复盘</b><span>品类小二 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-r"><b>新商新品</b><span>品类组长 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-r"><b>行业营销</b><span>营销小二 主导</span></div><div class="mx-c base"><i class="m t"></i></div><div class="mx-c base"><i class="m t"></i></div><div class="mx-c base"><i class="m t"></i></div><div class="mx-c base"><i class="m t"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"><i class="m t"></i></div><div class="mx-c scene"></div></div>
+<div class="mx-foot">
+  <div><p class="take">7 个作战中心复用<em>同一组 4 个基础专家</em>（数据 · 信息 · 协同 · 执行），
+    场景之间的差异只在外圈加 <em>1–2 个专属专家</em>。新增一个作战中心，绝大部分能力是现成的。</p>
+    <p class="note">虚线格为待确认：外圈专家的场景归属、以及行业营销一行的专家组合，需要按实际情况核对。</p></div>
+</div>
+</div>

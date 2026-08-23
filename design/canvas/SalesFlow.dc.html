@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+  <style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0C0918;
+       background-image:radial-gradient(1200px 560px at 50% -10%,rgba(124,58,237,.22),transparent 70%),
+                        radial-gradient(900px 460px at 50% 112%,rgba(49,46,129,.28),transparent 72%);
+       background-attachment:fixed;color:#F6F2FF;
+       font-family:'Sora','Noto Sans SC',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+       font-weight:500;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:#C6B4F5}a:hover{color:#E6DBFF}
+  .stage{width:1600px;max-width:100%;margin:0 auto;padding:30px 40px}
+  .mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;
+        padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .brand{display:flex;align-items:center;gap:14px}
+  .mark{flex:none;width:38px;height:38px}
+  h1{font-size:28px;font-weight:700;letter-spacing:.01em;text-wrap:balance}
+  .tag{margin-top:4px;font-size:12.5px;color:#9C8CCB;letter-spacing:.04em}
+  .legend{display:flex;gap:16px;align-items:center;font-size:11.5px;color:#9C8CCB;letter-spacing:.04em}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .key{width:20px;height:11px;border-radius:4px;display:block;
+       background:linear-gradient(180deg,#9D55FF,#7A28E8)}
+  .key.g{background:rgba(167,139,250,.09);border:1px dashed rgba(167,139,250,.5)}
+  .panel{border:1px dashed rgba(167,139,250,.26);border-radius:15px;
+         background:rgba(139,92,246,.045);padding:12px 15px 14px}
+  .head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .tier{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;color:#C6B4F5;
+        border:1px solid rgba(167,139,250,.5);border-radius:6px;padding:2px 7px;flex:none}
+  h2{font-size:17px;font-weight:700;letter-spacing:.02em}
+  .sub{font-size:12px;color:#9C8CCB}
+  .grid{display:grid;gap:9px}
+  .chip{border-radius:11px;padding:10px 12px;background:linear-gradient(180deg,#9D55FF,#7A28E8);
+        border:1px solid rgba(255,255,255,.16);
+        box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24);
+        transition:transform .18s ease,box-shadow .18s ease}
+  .chip:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(74,20,140,.48),inset 0 1px 0 rgba(255,255,255,.3)}
+  .chip b{display:block;font-size:14.5px;font-weight:700}
+  .chip i{display:block;font-style:normal;font-size:11.5px;color:rgba(255,255,255,.74);margin-top:2px}
+  .chip.g{background:rgba(167,139,250,.09);border:1px dashed rgba(167,139,250,.5);box-shadow:none}
+  .chip.g b{color:#C6B4F5}.chip.g i{color:#9C8CCB}
+  .chip.g:hover{transform:none;box-shadow:none;background:rgba(167,139,250,.14)}
+  .mono b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;font-weight:500}
+  .arrow{display:flex;align-items:center;justify-content:center;gap:9px;height:18px;color:#C6B4F5}
+  .arrow span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
+  .kb{margin-top:14px;border:1px solid rgba(129,140,248,.45);border-radius:15px;
+      background:rgba(67,56,202,.13);padding:12px 15px 14px}
+  .kb .tier{color:#C7CCFF;border-color:rgba(165,180,252,.5)}
+  .kb .grid{grid-template-columns:1fr 1fr 1.32fr;gap:12px}
+  .kbcard{border-radius:11px;padding:11px 14px;display:flex;flex-direction:column;gap:6px;
+          background:linear-gradient(180deg,#4C41C9,#2C2480);border:1px solid rgba(199,210,254,.26);
+          box-shadow:0 6px 16px rgba(23,18,80,.5),inset 0 1px 0 rgba(255,255,255,.16)}
+  .kbtop{display:flex;align-items:center;gap:9px}
+  .kbcard b{font-size:15px;font-weight:700}
+  .kbcard p{font-size:11.5px;line-height:1.6;color:rgba(255,255,255,.8)}
+  .idx{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;color:#D8DCFF;
+       border:1px solid rgba(216,220,255,.42);border-radius:5px;padding:2px 6px;flex:none}
+  @media (prefers-reduced-motion:reduce){.chip{transition:none}.chip:hover{transform:none}}
+
+  .deck-mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+             padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .deck-mast h1{font-size:26px}
+  .claim{margin-top:6px;font-size:14px;color:#D9CCFF;letter-spacing:.02em}
+  .mx{display:grid;grid-template-columns:236px repeat(10,1fr);gap:0 6px;align-items:stretch}
+  .mx-h{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;
+        padding:0 4px 9px;text-align:center;border-bottom:1px solid rgba(167,139,250,.26)}
+  .mx-h b{font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .mx-h span{font-size:9.5px;color:#9C8CCB;letter-spacing:.04em}
+  .mx-h.base{background:rgba(139,92,246,.10);border-radius:9px 9px 0 0}
+  .mx-h.corner{border-bottom:1px solid rgba(167,139,250,.26);align-items:flex-start;padding-left:2px}
+  .mx-h.corner b{font-size:11px;color:#9C8CCB;font-weight:500;letter-spacing:.1em}
+  .mx-r{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 10px 0 2px;
+       border-bottom:1px solid rgba(167,139,250,.13)}
+  .mx-r b{font-size:15px;font-weight:700}
+  .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
+             border-radius:999px;padding:1px 8px;align-self:flex-start}
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:73px;
+      border-bottom:1px solid rgba(167,139,250,.13)}
+  .mx-c.base{background:rgba(139,92,246,.10)}
+  .m{width:22px;height:22px;border-radius:7px;display:block;
+     background:linear-gradient(180deg,#9D55FF,#7A28E8);
+     box-shadow:0 3px 10px rgba(74,20,140,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+  .m.t{background:none;border:1px dashed rgba(167,139,250,.62);box-shadow:none}
+  .mx-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:16px;
+           padding-top:14px;border-top:1px solid rgba(167,139,250,.26)}
+  .take{font-size:14.5px;color:#F6F2FF;line-height:1.6;max-width:1180px}
+  .take em{font-style:normal;color:#C08BFF;font-weight:700}
+  .mlegend{display:flex;gap:18px;align-items:center;font-size:11.5px;color:#9C8CCB;white-space:nowrap}
+  .mlegend span{display:flex;align-items:center;gap:7px}
+  .mlegend i{width:16px;height:16px;border-radius:5px;display:block;
+             background:linear-gradient(180deg,#9D55FF,#7A28E8)}
+  .mlegend i.t{background:none;border:1px dashed rgba(167,139,250,.62)}
+  .note{margin-top:9px;font-size:11.5px;color:#9C8CCB}
+
+  .deck-mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+             padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid rgba(167,139,250,.26)}
+  .deck-mast h1{font-size:26px}
+  .claim{margin-top:6px;font-size:14px;color:#D9CCFF}
+  .today{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+         border:1px dashed rgba(180,150,120,.32);border-radius:13px;padding:12px 14px;margin-bottom:16px;
+         background:rgba(120,90,60,.07)}
+  .today .lb{font-size:11.5px;color:#D8A657;letter-spacing:.1em;font-weight:700;flex:none}
+  .today .st{font-size:11.5px;color:#BCAF9E;background:rgba(255,255,255,.045);
+             border:1px solid rgba(180,150,120,.22);border-radius:7px;padding:5px 9px;white-space:nowrap}
+  .today .sep{color:#7A6A55;font-size:11px}
+  .today .pain{margin-left:auto;font-size:11.5px;color:#D8A657;white-space:nowrap}
+  .casc{display:flex;align-items:stretch;gap:10px}
+  .rail{position:relative;width:32px;flex:none}
+  .rail:before{content:'';position:absolute;left:50%;top:0;bottom:6px;width:1px;
+               background:repeating-linear-gradient(180deg,rgba(167,139,250,.5) 0 5px,transparent 5px 10px)}
+  .rail:after{content:'';position:absolute;top:-1px;left:calc(50% - 4.5px);width:0;height:0;
+              border-left:4.5px solid transparent;border-right:4.5px solid transparent;
+              border-bottom:8px solid rgba(167,139,250,.6)}
+  .rail span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);writing-mode:vertical-rl;
+             font-size:10.5px;color:#9C8CCB;letter-spacing:.12em;white-space:nowrap;
+             background:#0C0918;padding:10px 0}
+  .cbody{flex:1;display:grid;grid-template-columns:46px 1fr;gap:0 10px;align-content:start}
+  .bdg{display:flex;align-items:center;justify-content:center;
+       font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:#C6B4F5;
+       border:1px solid rgba(167,139,250,.5);border-radius:8px;height:34px;align-self:center}
+  .lv{border:1px solid rgba(167,139,250,.3);border-radius:13px;background:rgba(139,92,246,.06);
+      padding:21px 16px;display:grid;grid-template-columns:1fr 300px 78px;gap:14px;align-items:center}
+  .lv b{font-size:15.5px;font-weight:700;display:block}
+  .lv p{font-size:13px;color:#C6B4F5;margin-top:4px;line-height:1.55}
+  .kbnote{margin-top:9px;font-size:11.5px;color:#C7CCFF;border-left:2px solid rgba(129,140,248,.65);
+          padding:2px 0 2px 9px;letter-spacing:.02em}
+  .lv.out{border-color:rgba(196,141,255,.55);background:linear-gradient(180deg,rgba(157,85,255,.20),rgba(122,40,232,.12))}
+  .lv.kb{border-color:rgba(129,140,248,.45)}
+  .sk{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+  .sk i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;
+        color:#E4D8FF;background:rgba(139,63,243,.30);border:1px solid rgba(167,139,250,.34);
+        border-radius:6px;padding:4px 8px}
+  .sk i.kbs{background:rgba(76,65,201,.42);border-color:rgba(165,180,252,.45);color:#DDE2FF}
+  .a2a{display:flex;align-items:center;gap:9px;height:30px;padding-left:2px;color:#C6B4F5}
+  .a2a span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
+  .hitl{font-size:10.5px;color:#C6B4F5;border:1px dashed rgba(167,139,250,.5);border-radius:999px;
+        padding:4px 0;text-align:center;letter-spacing:.04em}
+  .gain{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:12px;margin-top:18px}
+  .gcard{border:1px solid rgba(167,139,250,.34);border-radius:13px;padding:17px 18px;
+         background:rgba(139,92,246,.07)}
+  .gcard .k{font-size:11px;color:#9C8CCB;letter-spacing:.08em}
+  .gcard .v{display:flex;align-items:baseline;gap:10px;margin-top:5px}
+  .gcard .was{font-size:14px;color:#8E7FBF;text-decoration:line-through}
+  .gcard .now{font-size:23px;font-weight:700;color:#F6F2FF;letter-spacing:.01em}
+  .gcard .x{font-size:12px;color:#C08BFF;font-weight:700}
+  .gcard.qual .v{margin-top:7px}
+  .gcard.qual .now{font-size:16px;line-height:1.5}
+</style>
+</helmet>
+<div class="stage">
+<header class="deck-mast">
+  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>行业销售作战中心 · 端到端跑通</h1>
+    <p class="claim">一个行业目标，逐级下钻到 100+ 个商家的当日动作</p></div></div>
+  <div class="mlegend"><span>每一级派单后，Agent 先出结论与建议，人确认或与 Agent 对话调整</span></div>
+</header>
+<div class="today"><span class="lb">今天怎么干</span><span class="st">BI 按历史出目标</span><span class="sep">→</span><span class="st">人工每日盯盘</span><span class="sep">→</span><span class="st">逐级同步数据与风险</span><span class="sep">→</span><span class="st">拉会一起补缺口</span><span class="sep">→</span><span class="st">人工翻可用资源</span><span class="sep">→</span><span class="st">人工写商家建议</span><span class="sep">→</span><span class="st">商家执行</span>
+  <span class="pain">只有数字没有知识 · 靠人传话易遗漏 · 4 小时只覆盖 3–5 个头部商家</span></div>
+<div class="casc">
+  <div class="rail"><span>当日动作汇总回流 · 成为行业每日行动</span></div>
+  <div class="cbody"><div class="bdg">L1</div><div class="lv "><div><b>行业 GM Agent</b><p>看行业整体达成与缺口，把目标按品类 / 渠道拆成任务</p></div><div class="sk"><i class="">target-data</i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>A2A 派单</span></div><div class="bdg">L2</div><div class="lv "><div><b>品类组长 Agent · 渠道组长 Agent</b><p>接到任务自动下钻，定位问题品类与问题渠道，找出小二级的机会</p></div><div class="sk"><i class="">AI-data-pl</i><i class="">AI-data-qd</i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>A2A 派单</span></div><div class="bdg">L3</div><div class="lv kb"><div><b>品类小二 Agent · 渠道小二 Agent</b><p>下钻到商家 × 渠道，结合知识库找出可给的政策与资源</p><div class="kbnote">三层知识库注入 · 行业政策 / 资源扶持 / 商家档案</div></div><div class="sk"><i class="">AI-data-pl</i><i class="">AI-data-qd</i><i class="kbs">Kbsearch-tmg</i><i class="">Zhenduan</i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>生成动作</span></div><div class="bdg">L4</div><div class="lv out"><div><b>商家 × 渠道 运营动作</b><p>每个商家一套具体动作建议，AI 直接触达商家</p></div><div class="sk"><i class="">Renwu-bj</i></div><span></span></div></div>
+</div>
+<div class="gain">
+  <div class="gcard"><div class="k">单次跑完耗时</div>
+    <div class="v"><span class="was">4 小时</span><span class="now">1 小时</span><span class="x">÷4</span></div></div>
+  <div class="gcard"><div class="k">覆盖商家数</div>
+    <div class="v"><span class="was">3–5 个头部</span><span class="now">100+ 个核心</span><span class="x">×20+</span></div></div>
+  <div class="gcard qual"><div class="k">质变</div>
+    <div class="v"><span class="now">从「只有数字」到「数字 × 知识 × 动作」——抓手不再靠人传话，不遗漏、可复用到长尾商家</span></div></div>
+</div>
+</div>
+</x-dc>
+</body>
+</html>
