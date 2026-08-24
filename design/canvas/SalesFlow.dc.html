@@ -81,7 +81,7 @@
   .mx-r b{font-size:15px;font-weight:700}
   .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
              border-radius:999px;padding:1px 8px;align-self:flex-start}
-  .mx-c{display:flex;align-items:center;justify-content:center;min-height:60px;
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:68px;
       border-bottom:1px solid rgba(167,139,250,.13)}
   .mx-c.base{background:rgba(139,92,246,.10)}
   .m{width:22px;height:22px;border-radius:7px;display:block;
@@ -90,14 +90,7 @@
   .m.t{background:none;border:1px dashed rgba(167,139,250,.62);box-shadow:none}
   .mx-c.ft,.mx-r.ft{border-bottom:none;min-height:46px}
   .mx-c.ft{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:15px;font-weight:700;color:#C6B4F5}
-  .mx-c.sk,.mx-r.sk{border-bottom:none;min-height:76px;align-items:flex-start;padding-top:9px}
-  .mx-c.sk{flex-direction:column;justify-content:flex-start;gap:4px}
-  .mx-c.sk.base{border-radius:0 0 9px 9px}
-  .mx-c.sk i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9.5px;
-             color:#D9CCFF;border:1px dashed rgba(167,139,250,.5);border-radius:5px;
-             padding:3px 6px;white-space:nowrap;letter-spacing:-.01em}
-  .mx-c.sk em{font-style:normal;font-size:10px;color:#7B6CA6}
-  .mx-r.sk{justify-content:flex-start;font-size:11px;color:#9C8CCB;letter-spacing:.06em}
+  .mx-c.ft.base{border-radius:0 0 9px 9px}
   .mx-r.ft{justify-content:center;font-size:11px;color:#9C8CCB;letter-spacing:.06em;padding-top:4px}
   .mx-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:16px;
            padding-top:14px;border-top:1px solid rgba(167,139,250,.26)}
@@ -123,13 +116,14 @@
   .today .sep{color:#7A6A55;font-size:11px}
   .today .pain{margin-left:auto;font-size:11.5px;color:#D8A657;white-space:nowrap}
   .casc{display:flex;align-items:stretch;gap:10px}
-  .rail{position:relative;width:32px;flex:none}
+  .rail{position:relative;width:32px;flex:none;display:flex;flex-direction:column;
+        align-items:center;justify-content:center}
   .rail:before{content:'';position:absolute;left:50%;top:0;bottom:6px;width:1px;
                background:repeating-linear-gradient(180deg,rgba(167,139,250,.5) 0 5px,transparent 5px 10px)}
   .rail:after{content:'';position:absolute;top:-1px;left:calc(50% - 4.5px);width:0;height:0;
               border-left:4.5px solid transparent;border-right:4.5px solid transparent;
               border-bottom:8px solid rgba(167,139,250,.6)}
-  .rail span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);writing-mode:vertical-rl;
+  .rail span{position:relative;z-index:1;writing-mode:vertical-rl;
              font-size:10.5px;color:#9C8CCB;letter-spacing:.12em;white-space:nowrap;
              background:#0C0918;padding:10px 0}
   .cbody{flex:1;display:grid;grid-template-columns:46px 1fr;gap:0 10px;align-content:start}
@@ -147,7 +141,9 @@
   .sk{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
   .sk i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;
         color:#E4D8FF;background:rgba(139,63,243,.30);border:1px solid rgba(167,139,250,.34);
-        border-radius:6px;padding:4px 8px}
+        border-radius:6px;padding:4px 7px;text-align:center;line-height:1.3}
+  .sk i u{display:block;text-decoration:none;font-family:'Sora','Noto Sans SC',sans-serif;
+          font-size:9.5px;color:#C6B4F5;margin-top:1px}
   .sk i.kbs{background:rgba(76,65,201,.42);border-color:rgba(165,180,252,.45);color:#DDE2FF}
   .a2a{display:flex;align-items:center;gap:9px;height:30px;padding-left:2px;color:#C6B4F5}
   .a2a span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
@@ -175,7 +171,7 @@
   <span class="pain">只有数字没有知识 · 靠人传话易遗漏 · 4 小时只覆盖 3–5 个头部商家</span></div>
 <div class="casc">
   <div class="rail"><span>当日动作汇总回流 · 成为行业每日行动</span></div>
-  <div class="cbody"><div class="bdg">L1</div><div class="lv "><div><b>行业 GM Agent</b><p>看行业整体达成与缺口，把目标按品类 / 渠道拆成任务</p></div><div class="sk"><i class="">target-data</i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>A2A 派单</span></div><div class="bdg">L2</div><div class="lv "><div><b>品类组长 Agent · 渠道组长 Agent</b><p>接到任务自动下钻，定位问题品类与问题渠道，找出小二级的机会</p></div><div class="sk"><i class="">AI-data-pl</i><i class="">AI-data-qd</i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>A2A 派单</span></div><div class="bdg">L3</div><div class="lv kb"><div><b>品类小二 Agent · 渠道小二 Agent</b><p>下钻到商家 × 渠道，结合知识库找出可给的政策与资源</p><div class="kbnote">三层知识库注入 · 行业政策 / 资源扶持 / 商家档案</div></div><div class="sk"><i class="">AI-data-pl</i><i class="">AI-data-qd</i><i class="kbs">Kbsearch-tmg</i><i class="">Zhenduan</i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>生成动作</span></div><div class="bdg">L4</div><div class="lv out"><div><b>商家 × 渠道 运营动作</b><p>每个商家一套具体动作建议，AI 直接触达商家</p></div><div class="sk"><i class="">Renwu-bj</i></div><span></span></div></div>
+  <div class="cbody"><div class="bdg">L1</div><div class="lv "><div><b>行业 GM Agent</b><p>看行业整体达成与缺口，把目标按品类 / 渠道拆成任务</p></div><div class="sk"><i class="">target-data<u>销售追踪</u></i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>A2A 派单</span></div><div class="bdg">L2</div><div class="lv "><div><b>品类组长 Agent · 渠道组长 Agent</b><p>接到任务自动下钻，定位问题品类与问题渠道，找出小二级的机会</p></div><div class="sk"><i class="">AI-data-pl<u>品类取数</u></i><i class="">AI-data-qd<u>渠道取数</u></i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>A2A 派单</span></div><div class="bdg">L3</div><div class="lv kb"><div><b>品类小二 Agent · 渠道小二 Agent</b><p>下钻到商家 × 渠道，结合知识库找出可给的政策与资源</p><div class="kbnote">三层知识库注入 · 行业政策 / 资源扶持 / 商家档案</div></div><div class="sk"><i class="">AI-data-pl<u>品类取数</u></i><i class="">AI-data-qd<u>渠道取数</u></i><i class="kbs">Kbsearch-tmg<u>知识调用</u></i><i class="">Zhenduan<u>明确任务</u></i></div><span class="hitl">人确认</span></div><div></div><div class="a2a"><svg width="9" height="20" viewBox="0 0 9 20" fill="none" aria-hidden="true"><path d="M4.5 0V14" stroke="currentColor" stroke-width="1.1"/><path d="M1 13L4.5 19L8 13Z" fill="currentColor"/></svg><span>生成动作</span></div><div class="bdg">L4</div><div class="lv out"><div><b>商家 × 渠道 运营动作</b><p>每个商家一套具体动作建议，AI 直接触达商家</p></div><div class="sk"><i class="">Renwu-bj<u>任务找人</u></i></div><span></span></div></div>
 </div>
 <div class="gain">
   <div class="gcard"><div class="k">单次跑完耗时</div>

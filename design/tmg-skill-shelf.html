@@ -1,14 +1,7 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
-  <style>
+<title>Skill 能力货架</title>
+<style>
+/*@FONTS@*/
+
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:#0C0918;
        background-image:radial-gradient(1200px 560px at 50% -10%,rgba(124,58,237,.22),transparent 70%),
@@ -102,22 +95,50 @@
              background:linear-gradient(180deg,#9D55FF,#7A28E8)}
   .mlegend i.t{background:none;border:1px dashed rgba(167,139,250,.62)}
   .note{margin-top:9px;font-size:11.5px;color:#9C8CCB}
+
+  .shelf{display:grid;grid-template-columns:162px repeat(6,1fr);gap:12px}
+  .dl{display:flex;flex-direction:column;justify-content:center;gap:5px;padding-right:14px;
+      border-right:1px solid rgba(167,139,250,.22)}
+  .dl b{font-size:16.5px;font-weight:700;letter-spacing:.02em}
+  .dl em{font-style:normal;font-size:11px;color:#9C8CCB;line-height:1.5}
+  .dl i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;
+        color:#C6B4F5;border:1px solid rgba(167,139,250,.45);border-radius:5px;
+        padding:1px 6px;align-self:flex-start}
+  .sc{border-radius:12px;padding:13px 14px;min-height:104px;display:flex;flex-direction:column;
+      background:linear-gradient(180deg,#9D55FF,#7A28E8);border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24)}
+  .sc b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;font-weight:500;
+        color:rgba(255,255,255,.86);letter-spacing:-.01em}
+  .sc em{font-style:normal;font-size:16px;font-weight:700;margin-top:4px}
+  .sc span{margin-top:auto;padding-top:8px;font-size:10.5px;color:rgba(255,255,255,.74);line-height:1.5}
+  .sc.free span{color:#E9DCFF}
+  .slot{border-radius:12px;border:1px dashed rgba(167,139,250,.4);display:flex;
+        align-items:center;justify-content:center;font-size:12px;color:#7B6CA6}
+  .sfoot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:18px;
+         padding-top:15px;border-top:1px solid rgba(167,139,250,.26)}
+  .sfoot .take{max-width:1080px}
+  .stats{display:flex;gap:22px;white-space:nowrap}
+  .stats div{text-align:right}
+  .stats b{display:block;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:22px;
+           font-weight:700;color:#F6F2FF}
+  .stats span{font-size:10.5px;color:#9C8CCB;letter-spacing:.04em}
 </style>
-</helmet>
+
 <div class="stage">
 <header class="deck-mast">
-  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>场景 × 专家团 能力矩阵</h1>
-    <p class="claim">同一组专家反复复用在 8 个作战中心上——不是 8 套烟囱，是 1 套能力</p></div></div>
-  <div class="mlegend"><span><i></i>该场景配置了这位专家，空格为不配置</span></div>
+  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>Skill · 岗位动作的最小复用单元</h1>
+    <p class="claim">把岗位的 SOP 拆成标准动作——写得下来、调得动、审计得了，任何岗位 Agent 都能用同一个动作</p></div></div>
+  <div class="mlegend"><span>卡片下方是「谁在用」这个动作</span></div>
 </header>
-<div class="mx"><div class="mx-h corner"><b>作战中心 / 主导岗位</b></div><div class="mx-h base"><b>组织协同</b><span>行业秘书处</span></div><div class="mx-h base"><b>任务执行</b><span>行业王进喜</span></div><div class="mx-h base"><b>数据官</b><span>行业陈景润</span></div><div class="mx-h base"><b>知识官</b><span>行业藏书阁</span></div><div class="mx-h scene"><b>品类洞察</b><span>待命名</span></div><div class="mx-h scene"><b>竞对情报</b><span>行业猫头鹰</span></div><div class="mx-h scene"><b>用户增长</b><span>待命名</span></div><div class="mx-h scene"><b>财务官</b><span>行业葛朗台</span></div><div class="mx-h scene"><b>外部咨询</b><span>待命名</span></div><div class="mx-h scene"><b>营销创意</b><span>待命名</span></div><div class="mx-r"><b>行业销售</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>竞对控比</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>行业损益</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>行业用户</b><span>行业 GM 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>品类规划</b><span>品类组长 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-r"><b>商家复盘</b><span>品类小二 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>新商新品</b><span>品类组长 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-r"><b>行业营销</b><span>营销小二 主导</span></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c base"></div><div class="mx-c base"><i class="m"></i></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-c scene"></div><div class="mx-c scene"></div><div class="mx-c scene"><i class="m"></i></div><div class="mx-r ft">被几个作战中心复用</div><div class="mx-c ft base">8</div><div class="mx-c ft base">8</div><div class="mx-c ft base">7</div><div class="mx-c ft base">7</div><div class="mx-c ft scene">4</div><div class="mx-c ft scene">3</div><div class="mx-c ft scene">3</div><div class="mx-c ft scene">2</div><div class="mx-c ft scene">1</div><div class="mx-c ft scene">1</div></div>
-<div class="mx-foot">
-  <div><p class="take">8 个作战中心、44 个配置，全部由 <em>10 个专家</em>承担——
-    平均每个专家被 <em>4.4 个场景复用</em>；组织协同、任务执行 8 场景全覆盖。
-    新增一个作战中心，平均只要补 <em>1–2 个专属专家</em>。</p>
-    <p class="note">底色四列为基础专家；空格表示该场景暂不配置该专家。每个专家配哪些 Skill 见下一页。</p></div>
+<div class="shelf"><div class="dl"><b>取数类</b><em>把各系统的数拿回来</em><i>3</i></div><div class="sc"><b>target-data</b><em>销售追踪</em><span>数据官 · 品类洞察</span></div><div class="sc"><b>AI-data-qd</b><em>渠道取数</em><span>数据官</span></div><div class="sc"><b>AI-data-pl</b><em>品类取数</em><span>数据官 · 品类洞察 · 用户增长 · 外部咨询</span></div><div class="slot" style="grid-column:span 3">＋ 扩展位</div><div class="dl"><b>知识类</b><em>调政策、规则与历史打法</em><i>1</i></div><div class="sc"><b>Kbsearch-tmg</b><em>知识调用</em><span>知识官 · 品类洞察 · 用户增长 · 营销创意</span></div><div class="slot" style="grid-column:span 5">＋ 扩展位</div><div class="dl"><b>财务类</b><em>算账与投产比</em><i>1</i></div><div class="sc"><b>cmr-tmg</b><em>损益管理</em><span>财务官</span></div><div class="slot" style="grid-column:span 5">＋ 扩展位</div><div class="dl"><b>任务类</b><em>把结论变成派得下去的活</em><i>2</i></div><div class="sc"><b>Renwu-bj</b><em>任务找人</em><span>组织协同 · 任务执行 · 营销创意</span></div><div class="sc"><b>Zhenduan</b><em>明确任务</em><span>组织协同 · 外部咨询 · 营销创意</span></div><div class="slot" style="grid-column:span 4">＋ 扩展位</div><div class="dl"><b>品类类</b><em>品类经营的专属动作</em><i>6</i></div><div class="sc free"><b>category-scan</b><em>品类扫描</em><span>待分配到专家</span></div><div class="sc free"><b>category-planning</b><em>品类规划</em><span>待分配到专家</span></div><div class="sc free"><b>category-opportunity</b><em>品类机会</em><span>待分配到专家</span></div><div class="sc free"><b>category-bd</b><em>品类招商</em><span>待分配到专家</span></div><div class="sc free"><b>category-report</b><em>品类报告</em><span>待分配到专家</span></div><div class="sc free"><b>category-meeting</b><em>品类会议</em><span>待分配到专家</span></div></div>
+<div class="sfoot">
+  <p class="take"><em>Skill 不是员工技能，是岗位动作的最小可复用单元。</em>
+    能力不再长在某个人身上——同一个动作被不同岗位、不同专家反复调用；
+    新增一个作战中心，多数时候只是把现成的动作重新组合一次。</p>
+  <div class="stats">
+    <div><b>13</b><span>标准动作</span></div>
+    <div><b>5</b><span>能力域</span></div>
+    <div><b>18</b><span>被专家调用次数</span></div>
+  </div>
 </div>
 </div>
-</x-dc>
-</body>
-</html>

@@ -36,11 +36,15 @@ PRESET = {
 }
 SKILLS = [('target-data','销售追踪'), ('Kbsearch-tmg','知识调用'), ('cmr-tmg','损益管理'),
           ('AI-data-qd','渠道取数'), ('AI-data-pl','品类取数'), ('Renwu-bj','任务找人'),
-          ('Zhenduan','明确任务')]
-SKPRESET = {
-    '组织协同': ['Zhenduan','Renwu-bj'], '任务执行': ['Renwu-bj'],
+          ('Zhenduan','明确任务'), ('category-scan','品类扫描'), ('category-planning','品类规划'),
+          ('category-opportunity','品类机会'), ('category-bd','品类招商'),
+          ('category-report','品类报告'), ('category-meeting','品类会议')]
+SKPRESET = {   # 已按你上次勾的回填
     '数据官': ['target-data','AI-data-qd','AI-data-pl'], '知识官': ['Kbsearch-tmg'],
-    '财务官': ['cmr-tmg'],
+    '组织协同': ['Renwu-bj','Zhenduan'], '任务执行': ['Renwu-bj'], '竞对情报': [],
+    '财务官': ['cmr-tmg'], '外部咨询': ['AI-data-pl','Zhenduan'],
+    '营销创意': ['Kbsearch-tmg','Renwu-bj','Zhenduan'], '用户增长': ['Kbsearch-tmg','AI-data-pl'],
+    '品类洞察': ['target-data','Kbsearch-tmg','AI-data-pl'],
 }
 
 def sid(s): return 's' + str([x[0] for x in SCENES].index(s))
@@ -96,7 +100,7 @@ h2 span{{font-size:12px;font-weight:500;color:#9C8CCB;margin-left:10px}}
 .gx p{{margin-top:6px;font-size:11.5px;color:#9C8CCB;line-height:1.6}}
 .scroll{{overflow-x:auto;padding-bottom:4px}}
 .mx{{display:grid;grid-template-columns:186px repeat(10,minmax(96px,1fr));gap:0 4px;min-width:1180px}}
-.mx2{{display:grid;grid-template-columns:200px repeat(7,minmax(118px,1fr));gap:0 4px;min-width:1080px}}
+.mx2{{display:grid;grid-template-columns:180px repeat(13,minmax(104px,1fr));gap:0 4px;min-width:1600px}}
 .mx2 .hc b{{font-family:'JetBrains Mono',monospace;font-size:12px}}
 .mx2 .rl span{{font-family:'JetBrains Mono',monospace}}
 .hc{{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;
@@ -158,7 +162,7 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
     {''.join(rows)}
   </div></div>
 
-  <h2>每个专家配哪些 Skill<span>已按职能预勾了一部分，不对就改；空白的行是还没配 Skill 的专家</span></h2>
+  <h2>每个专家配哪些 Skill<span>已按你上次勾的回填；新加的 6 个 category-* 还没分配，麻烦勾一下（表格可以左右滑）</span></h2>
   <div class="scroll"><div class="mx2">
     <div class="corner">专家 / 代号</div>{skheads}
     {''.join(skrows)}

@@ -321,15 +321,36 @@ PICKS = {
 OWNERS = {'行业销售':'行业 GM','竞对控比':'行业 GM','行业损益':'行业 GM','行业用户':'行业 GM',
           'x品类规划':'', '品类规划':'品类组长','商家复盘':'品类小二','新商新品':'品类组长','行业营销':'营销小二'}
 MATRIX_ROWS = [(sc, OWNERS[sc], {e: 1 for e in PICKS[sc]}) for sc in PICKS]
-EXPERT_SKILLS = {
-    '组织协同': ['Zhenduan', 'Renwu-bj'],
+EXPERT_SKILLS = {   # 来自勾选页
+    '组织协同': ['Renwu-bj', 'Zhenduan'],
     '任务执行': ['Renwu-bj'],
     '数据官':   ['target-data', 'AI-data-qd', 'AI-data-pl'],
     '知识官':   ['Kbsearch-tmg'],
-    '品类洞察': [], '竞对情报': [], '用户增长': [],
+    '品类洞察': ['target-data', 'Kbsearch-tmg', 'AI-data-pl'],
+    '竞对情报': [],
+    '用户增长': ['Kbsearch-tmg', 'AI-data-pl'],
     '财务官':   ['cmr-tmg'],
-    '外部咨询': [], '营销创意': [],
+    '外部咨询': ['AI-data-pl', 'Zhenduan'],
+    '营销创意': ['Kbsearch-tmg', 'Renwu-bj', 'Zhenduan'],
 }
+SKILL_CN = {
+    'target-data': '销售追踪', 'Kbsearch-tmg': '知识调用', 'cmr-tmg': '损益管理',
+    'AI-data-qd': '渠道取数', 'AI-data-pl': '品类取数', 'Renwu-bj': '任务找人',
+    'Zhenduan': '明确任务', 'category-scan': '品类扫描', 'category-planning': '品类规划',
+    'category-opportunity': '品类机会', 'category-bd': '品类招商',
+    'category-report': '品类报告', 'category-meeting': '品类会议',
+}
+DOMAINS = [
+    ('取数类', '把各系统的数拿回来', ['target-data', 'AI-data-qd', 'AI-data-pl']),
+    ('知识类', '调政策、规则与历史打法', ['Kbsearch-tmg']),
+    ('财务类', '算账与投产比', ['cmr-tmg']),
+    ('任务类', '把结论变成派得下去的活', ['Renwu-bj', 'Zhenduan']),
+    ('品类类', '品类经营的专属动作', ['category-scan', 'category-planning', 'category-opportunity',
+                                     'category-bd', 'category-report', 'category-meeting']),
+]
+SKILL_USERS = {k: [e for e, ks in EXPERT_SKILLS.items() if k in ks] for k in SKILL_CN}
+CALLS = sum(len(u) for u in SKILL_USERS.values())
+ASSIGNED = sum(1 for u in SKILL_USERS.values() if u)
 REUSE = {fn: sum(1 for sc in PICKS if fn in PICKS[sc]) for fn, _c, _k in EXPERT_COLS}
 FILLED = sum(len(v) for v in PICKS.values())
 AVG = round(FILLED / len(EXPERT_COLS), 1)
@@ -352,7 +373,7 @@ MATRIX_CSS = """
   .mx-r b{font-size:15px;font-weight:700}
   .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
              border-radius:999px;padding:1px 8px;align-self:flex-start}
-  .mx-c{display:flex;align-items:center;justify-content:center;min-height:60px;
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:68px;
       border-bottom:1px solid rgba(167,139,250,.13)}
   .mx-c.base{background:rgba(139,92,246,.10)}
   .m{width:22px;height:22px;border-radius:7px;display:block;
@@ -361,14 +382,7 @@ MATRIX_CSS = """
   .m.t{background:none;border:1px dashed rgba(167,139,250,.62);box-shadow:none}
   .mx-c.ft,.mx-r.ft{border-bottom:none;min-height:46px}
   .mx-c.ft{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:15px;font-weight:700;color:#C6B4F5}
-  .mx-c.sk,.mx-r.sk{border-bottom:none;min-height:76px;align-items:flex-start;padding-top:9px}
-  .mx-c.sk{flex-direction:column;justify-content:flex-start;gap:4px}
-  .mx-c.sk.base{border-radius:0 0 9px 9px}
-  .mx-c.sk i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9.5px;
-             color:#D9CCFF;border:1px dashed rgba(167,139,250,.5);border-radius:5px;
-             padding:3px 6px;white-space:nowrap;letter-spacing:-.01em}
-  .mx-c.sk em{font-style:normal;font-size:10px;color:#7B6CA6}
-  .mx-r.sk{justify-content:flex-start;font-size:11px;color:#9C8CCB;letter-spacing:.06em}
+  .mx-c.ft.base{border-radius:0 0 9px 9px}
   .mx-r.ft{justify-content:center;font-size:11px;color:#9C8CCB;letter-spacing:.06em;padding-top:4px}
   .mx-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:16px;
            padding-top:14px;border-top:1px solid rgba(167,139,250,.26)}
@@ -395,11 +409,6 @@ def matrix_body():
     cells.append('<div class="mx-r ft">被几个作战中心复用</div>')
     for name, _, kind in EXPERT_COLS:
         cells.append(f'<div class="mx-c ft {kind}">{REUSE[name]}</div>')
-    cells.append('<div class="mx-r sk">配置的 Skill</div>')
-    for name, _, kind in EXPERT_COLS:
-        sk = EXPERT_SKILLS.get(name) or []
-        inner = ''.join(f'<i>{k}</i>' for k in sk) if sk else '<em>待配</em>'
-        cells.append(f'<div class="mx-c sk {kind}">{inner}</div>')
     return f"""<div class="stage">
 <header class="deck-mast">
   <div class="brand">{MARK}<div><h1>场景 × 专家团 能力矩阵</h1>
@@ -411,7 +420,7 @@ def matrix_body():
   <div><p class="take">8 个作战中心、{FILLED} 个配置，全部由 <em>10 个专家</em>承担——
     平均每个专家被 <em>{AVG} 个场景复用</em>；组织协同、任务执行 8 场景全覆盖。
     新增一个作战中心，平均只要补 <em>1–2 个专属专家</em>。</p>
-    <p class="note">底色四列为基础专家；空格表示该场景暂不配置该专家。最下面一行 Skill 是按职能推的（虚线框），待确认。</p></div>
+    <p class="note">底色四列为基础专家；空格表示该场景暂不配置该专家。每个专家配哪些 Skill 见下一页。</p></div>
 </div>
 </div>"""
 
@@ -449,13 +458,14 @@ FLOW_CSS = """
   .today .sep{color:#7A6A55;font-size:11px}
   .today .pain{margin-left:auto;font-size:11.5px;color:#D8A657;white-space:nowrap}
   .casc{display:flex;align-items:stretch;gap:10px}
-  .rail{position:relative;width:32px;flex:none}
+  .rail{position:relative;width:32px;flex:none;display:flex;flex-direction:column;
+        align-items:center;justify-content:center}
   .rail:before{content:'';position:absolute;left:50%;top:0;bottom:6px;width:1px;
                background:repeating-linear-gradient(180deg,rgba(167,139,250,.5) 0 5px,transparent 5px 10px)}
   .rail:after{content:'';position:absolute;top:-1px;left:calc(50% - 4.5px);width:0;height:0;
               border-left:4.5px solid transparent;border-right:4.5px solid transparent;
               border-bottom:8px solid rgba(167,139,250,.6)}
-  .rail span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);writing-mode:vertical-rl;
+  .rail span{position:relative;z-index:1;writing-mode:vertical-rl;
              font-size:10.5px;color:#9C8CCB;letter-spacing:.12em;white-space:nowrap;
              background:#0C0918;padding:10px 0}
   .cbody{flex:1;display:grid;grid-template-columns:46px 1fr;gap:0 10px;align-content:start}
@@ -473,7 +483,9 @@ FLOW_CSS = """
   .sk{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
   .sk i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;
         color:#E4D8FF;background:rgba(139,63,243,.30);border:1px solid rgba(167,139,250,.34);
-        border-radius:6px;padding:4px 8px}
+        border-radius:6px;padding:4px 7px;text-align:center;line-height:1.3}
+  .sk i u{display:block;text-decoration:none;font-family:'Sora','Noto Sans SC',sans-serif;
+          font-size:9.5px;color:#C6B4F5;margin-top:1px}
   .sk i.kbs{background:rgba(76,65,201,.42);border-color:rgba(165,180,252,.45);color:#DDE2FF}
   .a2a{display:flex;align-items:center;gap:9px;height:30px;padding-left:2px;color:#C6B4F5}
   .a2a span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
@@ -497,7 +509,8 @@ def flow_body():
         for i, s in enumerate(TODAY))
     rows = []
     for tag, name, desc, skills, arrow, kind in LEVELS:
-        sk = ''.join(f'<i class="{"kbs" if k == "Kbsearch-tmg" else ""}">{k}</i>' for k in skills)
+        sk = ''.join(f'<i class="{"kbs" if k == "Kbsearch-tmg" else ""}">{k}'
+                     f'<u>{SKILL_CN.get(k, "")}</u></i>' for k in skills)
         hitl = '' if kind == 'out' else '<span class="hitl">人确认</span>'
         kbn = ('<div class="kbnote">三层知识库注入 · 行业政策 / 资源扶持 / 商家档案</div>'
                if kind == 'kb' else '')
@@ -538,21 +551,88 @@ FLOW_BODY = flow_body()
     encoding='utf-8')
 (CANVAS/'SalesFlow.dc.html').write_text(dc(MATRIX_CSS + FLOW_CSS, FLOW_BODY), encoding='utf-8')
 
+# ============================================ 汇报页 · Skill 能力货架
+SHELF_CSS = """
+  .shelf{display:grid;grid-template-columns:162px repeat(6,1fr);gap:12px}
+  .dl{display:flex;flex-direction:column;justify-content:center;gap:5px;padding-right:14px;
+      border-right:1px solid rgba(167,139,250,.22)}
+  .dl b{font-size:16.5px;font-weight:700;letter-spacing:.02em}
+  .dl em{font-style:normal;font-size:11px;color:#9C8CCB;line-height:1.5}
+  .dl i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;
+        color:#C6B4F5;border:1px solid rgba(167,139,250,.45);border-radius:5px;
+        padding:1px 6px;align-self:flex-start}
+  .sc{border-radius:12px;padding:13px 14px;min-height:104px;display:flex;flex-direction:column;
+      background:linear-gradient(180deg,#9D55FF,#7A28E8);border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24)}
+  .sc b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;font-weight:500;
+        color:rgba(255,255,255,.86);letter-spacing:-.01em}
+  .sc em{font-style:normal;font-size:16px;font-weight:700;margin-top:4px}
+  .sc span{margin-top:auto;padding-top:8px;font-size:10.5px;color:rgba(255,255,255,.74);line-height:1.5}
+  .sc.free span{color:#E9DCFF}
+  .slot{border-radius:12px;border:1px dashed rgba(167,139,250,.4);display:flex;
+        align-items:center;justify-content:center;font-size:12px;color:#7B6CA6}
+  .sfoot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:18px;
+         padding-top:15px;border-top:1px solid rgba(167,139,250,.26)}
+  .sfoot .take{max-width:1080px}
+  .stats{display:flex;gap:22px;white-space:nowrap}
+  .stats div{text-align:right}
+  .stats b{display:block;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:22px;
+           font-weight:700;color:#F6F2FF}
+  .stats span{font-size:10.5px;color:#9C8CCB;letter-spacing:.04em}
+"""
+
+def shelf_body():
+    rows = []
+    for name, desc, ks in DOMAINS:
+        rows.append(f'<div class="dl"><b>{name}</b><em>{desc}</em><i>{len(ks)}</i></div>')
+        for k in ks:
+            users = SKILL_USERS[k]
+            who = ' · '.join(users) if users else '待分配到专家'
+            free = '' if users else ' free'
+            rows.append(f'<div class="sc{free}"><b>{k}</b><em>{SKILL_CN[k]}</em>'
+                        f'<span>{who}</span></div>')
+        if len(ks) < 6:
+            span = 6 - len(ks)
+            rows.append(f'<div class="slot" style="grid-column:span {span}">＋ 扩展位</div>')
+    return f"""<div class="stage">
+<header class="deck-mast">
+  <div class="brand">{MARK}<div><h1>Skill · 岗位动作的最小复用单元</h1>
+    <p class="claim">把岗位的 SOP 拆成标准动作——写得下来、调得动、审计得了，任何岗位 Agent 都能用同一个动作</p></div></div>
+  <div class="mlegend"><span>卡片下方是「谁在用」这个动作</span></div>
+</header>
+<div class="shelf">{''.join(rows)}</div>
+<div class="sfoot">
+  <p class="take"><em>Skill 不是员工技能，是岗位动作的最小可复用单元。</em>
+    能力不再长在某个人身上——同一个动作被不同岗位、不同专家反复调用；
+    新增一个作战中心，多数时候只是把现成的动作重新组合一次。</p>
+  <div class="stats">
+    <div><b>{len(SKILL_CN)}</b><span>标准动作</span></div>
+    <div><b>{len(DOMAINS)}</b><span>能力域</span></div>
+    <div><b>{CALLS}</b><span>被专家调用次数</span></div>
+  </div>
+</div>
+</div>"""
+
+SHELF_BODY = shelf_body()
+(ROOT/'tmg-skill-shelf.html').write_text(
+    f'<title>Skill 能力货架</title>\n<style>\n/*@FONTS@*/\n{CSS}{MATRIX_CSS}{SHELF_CSS}</style>\n\n{SHELF_BODY}\n',
+    encoding='utf-8')
+(CANVAS/'Shelf.dc.html').write_text(dc(MATRIX_CSS + SHELF_CSS, SHELF_BODY), encoding='utf-8')
+
 canvas = {
  "pages":[{"id":"page-1","name":"汇报页"},{"id":"page-2","name":"其它排版方向"}],
  "artboards":[
   {"file":"Main.dc.html","title":"P1 · 平台总架构","page":"page-1","x":0,"y":0,"w":1600,"h":900},
-  {"file":"Matrix.dc.html","title":"P2 · 场景 × 专家团 矩阵","page":"page-1","x":1760,"y":0,"w":1600,"h":900},
-  {"file":"SalesFlow.dc.html","title":"P3 · 行业销售端到端","page":"page-1","x":3520,"y":0,"w":1600,"h":900},
+  {"file":"Matrix.dc.html","title":"P2 · 场景 × 专家团","page":"page-1","x":1760,"y":0,"w":1600,"h":900},
+  {"file":"Shelf.dc.html","title":"P3 · Skill 能力货架","page":"page-1","x":3520,"y":0,"w":1600,"h":900},
+  {"file":"SalesFlow.dc.html","title":"P4 · 行业销售端到端","page":"page-1","x":5280,"y":0,"w":1600,"h":900},
   {"file":"Enclosure.dc.html","title":"方向二 · 环抱式","page":"page-2","x":0,"y":0,"w":1600,"h":900},
   {"file":"Granularity.dc.html","title":"方向三 · 粒度阶梯","page":"page-2","x":1760,"y":0,"w":1600,"h":900},
   {"file":"Rail.dc.html","title":"方向四 · 横向流水线","page":"page-2","x":3520,"y":0,"w":1600,"h":830}
  ],
  "annotations":[
-  {"id":"note-p2","page":"page-1","x":1760,"y":-160,"w":520,
-   "text":"P2 矩阵里的虚线格是推断的，需要核对：外圈专家（竞对/财务/外部咨询/营销创意/用户增长/品类洞察）的场景归属，以及行业营销一整行。\\n另外后 4 个专家是新的，P1 主架构图上还没有。"},
   {"id":"note-p3","page":"page-1","x":3520,"y":-160,"w":520,
-   "text":"P3 全部内容来自你给的链路描述，没有推断。"},
+   "text":"P3 是新加的 Skill 页。6 个 category-* 动作还没挂到专家上，卡片下方写的是「待分配到专家」。\\n中文名是我按代号字面写的，要改直接说。"},
   {"id":"note-alts","page":"page-2","x":0,"y":-120,"w":460,
    "text":"没有选中的三个排版方向，留作参考。"}
  ],
