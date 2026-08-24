@@ -116,16 +116,20 @@
   .cn.here em{color:rgba(255,255,255,.78)}
   .cn.here i{font-style:normal;font-size:11px;color:rgba(255,255,255,.72);margin-left:2px}
   .ca{font-size:10.5px;color:#9C8CCB;letter-spacing:.1em;display:flex;align-items:center;gap:7px}
-  .egrid{column-count:5;column-gap:13px}
+  .egrid{display:grid;grid-template-columns:repeat(5,1fr);gap:13px}
   .ec{border:1px solid rgba(167,139,250,.3);border-radius:14px;background:rgba(139,92,246,.05);
-      padding:0 0 12px;break-inside:avoid;margin-bottom:13px;display:inline-block;width:100%}
-  .ec-h{padding:12px 14px 11px;border-bottom:1px solid rgba(167,139,250,.22)}
+      padding:0 0 12px;display:flex;flex-direction:column}
+  .ec-h{padding:14px 14px 13px;border-bottom:1px solid rgba(167,139,250,.22)}
   .ec-h b{display:block;font-size:16px;font-weight:700}
   .ec-h span{display:block;font-size:10.5px;color:#9C8CCB;margin-top:2px}
   .ec-h i{display:inline-block;font-style:normal;margin-top:7px;font-size:10.5px;color:#C6B4F5;
           border:1px solid rgba(167,139,250,.42);border-radius:999px;padding:1px 8px}
-  .ec-s{display:flex;flex-direction:column;gap:5px;padding:11px 12px 0}
-  .ec-s div{display:flex;align-items:baseline;gap:7px;border-radius:8px;padding:5px 8px;
+  .ec-s{display:flex;flex-direction:column;gap:7px;padding:13px 12px 0;flex:1}
+  .ec-s .slot,.ec-s .more{background:none;border:1px dashed rgba(167,139,250,.34);
+        justify-content:center;color:#7B6CA6;font-size:11px;letter-spacing:.04em}
+  .ec-s .more{border-style:solid;border-color:rgba(167,139,250,.26);
+        background:rgba(167,139,250,.07);color:#C6B4F5}
+  .ec-s div{display:flex;align-items:baseline;gap:7px;border-radius:8px;padding:8px 9px;
             background:linear-gradient(180deg,rgba(157,85,255,.34),rgba(122,40,232,.24));
             border:1px solid rgba(167,139,250,.3)}
   .ec-s b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;font-weight:500;
@@ -147,7 +151,7 @@
 <header class="deck-mast">
   <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>每位专家手上的标准动作</h1>
     <p class="claim">Skill 挂在专家身上，专家是岗位 Agent 的子 Agent——同一个动作被不同专家反复调用</p></div></div>
-  <div class="mlegend"><span>动作后面的 ×N＝有几位专家在用同一个动作</span></div>
+  <div class="mlegend"><span>动作后的 ×N＝有几位专家在用同一个动作；卡内按复用次数排序，每张最多列 4 个</span></div>
 </header>
 <div class="chain">
   <div class="cn"><b>岗位 Agent</b><em>7</em></div>
@@ -156,7 +160,7 @@
   <div class="ca"><span>配置</span><svg width="22" height="9" viewBox="0 0 22 9" fill="none" aria-hidden="true"><path d="M0 4.5H16" stroke="#9C8CCB" stroke-width="1.1"/><path d="M15 1L21 4.5L15 8Z" fill="#9C8CCB"/></svg></div>
   <div class="cn here"><b>Skill</b><em>13</em><i>本页</i></div>
 </div>
-<div class="egrid"><div class="ec"><div class="ec-h"><b>组织协同</b><span>行业秘书处</span><i>8 个作战中心在用</i></div><div class="ec-s"><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div></div></div><div class="ec"><div class="ec-h"><b>任务执行</b><span>行业王进喜</span><i>8 个作战中心在用</i></div><div class="ec-s"><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div></div></div><div class="ec"><div class="ec-h"><b>数据官</b><span>行业陈景润</span><i>7 个作战中心在用</i></div><div class="ec-s"><div><b>target-data</b><em>销售追踪</em><u>×2</u></div><div><b>AI-data-qd</b><em>渠道取数</em><u>×1</u></div><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-meeting</b><em>品类会议</em><u>×2</u></div></div></div><div class="ec"><div class="ec-h"><b>知识官</b><span>行业藏书阁</span><i>7 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div></div></div><div class="ec"><div class="ec-h"><b>品类洞察</b><span>待命名</span><i>4 个作战中心在用</i></div><div class="ec-s"><div><b>target-data</b><em>销售追踪</em><u>×2</u></div><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-planning</b><em>品类规划</em><u>×2</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>category-bd</b><em>品类招商</em><u>×1</u></div><div><b>category-meeting</b><em>品类会议</em><u>×2</u></div></div></div><div class="ec"><div class="ec-h"><b>竞对情报</b><span>行业猫头鹰</span><i>3 个作战中心在用</i></div><div class="ec-s"><div><b>category-scan</b><em>品类扫描</em><u>×1</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>category-report</b><em>品类报告</em><u>×1</u></div></div></div><div class="ec"><div class="ec-h"><b>用户增长</b><span>待命名</span><i>3 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-planning</b><em>品类规划</em><u>×2</u></div></div></div><div class="ec"><div class="ec-h"><b>财务官</b><span>行业葛朗台</span><i>2 个作战中心在用</i></div><div class="ec-s"><div><b>cmr-tmg</b><em>损益管理</em><u>×1</u></div></div></div><div class="ec"><div class="ec-h"><b>外部咨询</b><span>待命名</span><i>1 个作战中心在用</i></div><div class="ec-s"><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div></div></div><div class="ec"><div class="ec-h"><b>营销创意</b><span>待命名</span><i>1 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div></div></div></div>
+<div class="egrid"><div class="ec"><div class="ec-h"><b>组织协同</b><span>行业秘书处</span><i>8 个作战中心在用</i></div><div class="ec-s"><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>任务执行</b><span>行业王进喜</span><i>8 个作战中心在用</i></div><div class="ec-s"><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>数据官</b><span>行业陈景润</span><i>7 个作战中心在用</i></div><div class="ec-s"><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>target-data</b><em>销售追踪</em><u>×2</u></div><div><b>category-meeting</b><em>品类会议</em><u>×2</u></div><div><b>AI-data-qd</b><em>渠道取数</em><u>×1</u></div></div></div><div class="ec"><div class="ec-h"><b>知识官</b><span>行业藏书阁</span><i>7 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>品类洞察</b><span>待命名</span><i>4 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div class="more">… 还有 4 个</div></div></div><div class="ec"><div class="ec-h"><b>竞对情报</b><span>行业猫头鹰</span><i>3 个作战中心在用</i></div><div class="ec-s"><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>category-scan</b><em>品类扫描</em><u>×1</u></div><div><b>category-report</b><em>品类报告</em><u>×1</u></div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>用户增长</b><span>待命名</span><i>3 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-planning</b><em>品类规划</em><u>×2</u></div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>财务官</b><span>行业葛朗台</span><i>2 个作战中心在用</i></div><div class="ec-s"><div><b>cmr-tmg</b><em>损益管理</em><u>×1</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>外部咨询</b><span>待命名</span><i>1 个作战中心在用</i></div><div class="ec-s"><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>营销创意</b><span>待命名</span><i>1 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div></div></div></div>
 <div class="sfoot">
   <p class="take"><em>Skill 不是员工技能，是岗位动作的最小可复用单元。</em>
     能力不再长在某个人身上——13 个动作被 10 位专家调用 29 次，

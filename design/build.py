@@ -567,16 +567,20 @@ SHELF_CSS = """
   .cn.here em{color:rgba(255,255,255,.78)}
   .cn.here i{font-style:normal;font-size:11px;color:rgba(255,255,255,.72);margin-left:2px}
   .ca{font-size:10.5px;color:#9C8CCB;letter-spacing:.1em;display:flex;align-items:center;gap:7px}
-  .egrid{column-count:5;column-gap:13px}
+  .egrid{display:grid;grid-template-columns:repeat(5,1fr);gap:13px}
   .ec{border:1px solid rgba(167,139,250,.3);border-radius:14px;background:rgba(139,92,246,.05);
-      padding:0 0 12px;break-inside:avoid;margin-bottom:13px;display:inline-block;width:100%}
-  .ec-h{padding:12px 14px 11px;border-bottom:1px solid rgba(167,139,250,.22)}
+      padding:0 0 12px;display:flex;flex-direction:column}
+  .ec-h{padding:14px 14px 13px;border-bottom:1px solid rgba(167,139,250,.22)}
   .ec-h b{display:block;font-size:16px;font-weight:700}
   .ec-h span{display:block;font-size:10.5px;color:#9C8CCB;margin-top:2px}
   .ec-h i{display:inline-block;font-style:normal;margin-top:7px;font-size:10.5px;color:#C6B4F5;
           border:1px solid rgba(167,139,250,.42);border-radius:999px;padding:1px 8px}
-  .ec-s{display:flex;flex-direction:column;gap:5px;padding:11px 12px 0}
-  .ec-s div{display:flex;align-items:baseline;gap:7px;border-radius:8px;padding:5px 8px;
+  .ec-s{display:flex;flex-direction:column;gap:7px;padding:13px 12px 0;flex:1}
+  .ec-s .slot,.ec-s .more{background:none;border:1px dashed rgba(167,139,250,.34);
+        justify-content:center;color:#7B6CA6;font-size:11px;letter-spacing:.04em}
+  .ec-s .more{border-style:solid;border-color:rgba(167,139,250,.26);
+        background:rgba(167,139,250,.07);color:#C6B4F5}
+  .ec-s div{display:flex;align-items:baseline;gap:7px;border-radius:8px;padding:8px 9px;
             background:linear-gradient(180deg,rgba(157,85,255,.34),rgba(122,40,232,.24));
             border:1px solid rgba(167,139,250,.3)}
   .ec-s b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;font-weight:500;
@@ -602,10 +606,16 @@ def arrow_r(label):
 
 def shelf_body():
     cards = []
+    ROWS = 4
     for fn, code, _kind in EXPERT_COLS:
-        ks = EXPERT_SKILLS.get(fn) or []
+        ks = sorted(EXPERT_SKILLS.get(fn) or [], key=lambda k: -len(SKILL_USERS[k]))
+        shown = ks[:ROWS - 1] if len(ks) > ROWS else ks
         lines = ''.join(
-            f'<div><b>{k}</b><em>{SKILL_CN[k]}</em><u>×{len(SKILL_USERS[k])}</u></div>' for k in ks)
+            f'<div><b>{k}</b><em>{SKILL_CN[k]}</em><u>×{len(SKILL_USERS[k])}</u></div>' for k in shown)
+        if len(ks) > ROWS:
+            lines += f'<div class="more">… 还有 {len(ks) - len(shown)} 个</div>'
+        else:
+            lines += '<div class="slot">＋ 扩展位</div>' * (ROWS - len(ks))
         cards.append(f'<div class="ec"><div class="ec-h"><b>{fn}</b><span>{code}</span>'
                      f'<i>{REUSE[fn]} 个作战中心在用</i></div>'
                      f'<div class="ec-s">{lines}</div></div>')
@@ -613,7 +623,7 @@ def shelf_body():
 <header class="deck-mast">
   <div class="brand">{MARK}<div><h1>每位专家手上的标准动作</h1>
     <p class="claim">Skill 挂在专家身上，专家是岗位 Agent 的子 Agent——同一个动作被不同专家反复调用</p></div></div>
-  <div class="mlegend"><span>动作后面的 ×N＝有几位专家在用同一个动作</span></div>
+  <div class="mlegend"><span>动作后的 ×N＝有几位专家在用同一个动作；卡内按复用次数排序，每张最多列 4 个</span></div>
 </header>
 <div class="chain">
   <div class="cn"><b>岗位 Agent</b><em>7</em></div>
