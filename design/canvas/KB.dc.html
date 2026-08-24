@@ -146,17 +146,17 @@
            font-weight:700;color:#F6F2FF}
   .stats span{font-size:10.5px;color:#9C8CCB;letter-spacing:.04em}
 
-  .kbwrap{display:grid;grid-template-columns:1fr 560px;gap:26px;align-items:center}
+  .kbwrap{display:grid;grid-template-columns:1fr 520px;gap:26px;align-items:center}
   .tiers{display:flex;flex-direction:column;gap:17px}
   .kbt{border:1px solid rgba(129,140,248,.45);border-radius:15px;background:rgba(67,56,202,.12);
-        padding:21px 20px 22px}
+        padding:17px 20px 18px}
   .kbt-h{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-bottom:14px}
   .kbt-h b{font-size:17.5px;font-weight:700}
   .kbt-h em{font-style:normal;font-size:12.5px;color:#9C8CCB}
   .kidx{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;color:#D8DCFF;
         border:1px solid rgba(216,220,255,.42);border-radius:5px;padding:2px 7px;flex:none}
   .ex{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  .ex div{border-radius:11px;padding:18px 16px;font-size:15px;font-weight:700;
+  .ex div{border-radius:11px;padding:14px 16px;font-size:15px;font-weight:700;
           background:linear-gradient(180deg,#4C41C9,#2C2480);border:1px solid rgba(199,210,254,.26);
           box-shadow:0 5px 14px rgba(23,18,80,.45),inset 0 1px 0 rgba(255,255,255,.14)}
   .ex div:before{content:'「';color:rgba(216,220,255,.5)}
@@ -167,7 +167,7 @@
   .memchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
   .memchips i{font-style:normal;font-size:11px;color:#DDE2FF;background:rgba(76,65,201,.34);
               border:1px solid rgba(165,180,252,.34);border-radius:999px;padding:3px 10px}
-  .wheel{position:relative;width:560px;height:560px;margin:0 auto}
+  .wheel{position:relative;width:520px;height:520px;margin:0 auto}
   .wheel svg{position:absolute;inset:0}
   .wn{position:absolute;transform:translate(-50%,-50%);width:172px;text-align:center;
       border-radius:11px;padding:9px 8px;background:rgba(67,56,202,.30);
@@ -181,32 +181,55 @@
   .wc b{display:block;font-size:21px;font-weight:700}
   .wc em{display:block;font-style:normal;font-size:11.5px;color:#B9BEEB;margin-top:5px;line-height:1.5}
   .wa{position:absolute;transform-origin:center;color:#8B90D8}
-  .kbfoot{margin-top:16px;padding-top:14px;border-top:1px solid rgba(129,140,248,.3);
-          display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
-  .kbfoot .take{max-width:1120px}
+  .kbfoot{margin-top:15px;padding-top:14px;border-top:1px solid rgba(129,140,248,.3)}
+  .chainrow{display:grid;grid-template-columns:repeat(5,1fr);gap:0 8px;align-items:stretch}
+  .ch{border-radius:11px;padding:11px 13px;position:relative}
+  .ch b{display:block;font-size:13px;font-weight:700}
+  .ch em{display:block;font-style:normal;font-size:11.5px;margin-top:4px;line-height:1.5}
+  .ch.d{background:linear-gradient(180deg,rgba(157,85,255,.30),rgba(122,40,232,.20));
+        border:1px solid rgba(167,139,250,.45)}
+  .ch.d em{color:#D9CCFF}
+  .ch.k{background:rgba(67,56,202,.26);border:1px solid rgba(165,180,252,.42)}
+  .ch.k b{color:#C7CCFF}
+  .ch.k em{color:#DDE2FF}
+  .ch.a{background:linear-gradient(180deg,#9D55FF,#7A28E8);border:1px solid rgba(255,255,255,.18);
+        box-shadow:0 6px 16px rgba(74,20,140,.4)}
+  .ch.a em{color:rgba(255,255,255,.82)}
+  .ch:not(:last-child):after{content:'';position:absolute;right:-8px;top:50%;
+        transform:translateY(-50%);width:0;height:0;border-top:5px solid transparent;
+        border-bottom:5px solid transparent;border-left:7px solid rgba(165,180,252,.7)}
+  .chtag{font-size:10.5px;color:#9C8CCB;letter-spacing:.1em;margin-bottom:8px;display:block}
+  .kbfoot .take{margin-top:13px;font-size:13.5px}
 </style>
 </helmet>
 <div class="stage">
 <header class="deck-mast">
-  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>三层知识库 · 从散落文档到组织资产</h1>
-    <p class="claim">知识不只是被查——它被 Agent 蒸馏进来、被调用出去、再从使用里沉淀回来</p></div></div>
+  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>三层知识库 · 让数据诊断落到运营动作</h1>
+    <p class="claim">没有它，Agent 只能告诉你哪里跌了；有了它，才能告诉你这个商家该给什么、怎么给</p></div></div>
   <div class="mlegend"><span>「」内为知识库里的真实条目</span></div>
 </header>
 <div class="kbwrap">
-  <div class="tiers"><section class="kbt"><div class="kbt-h"><span class="kidx">L1</span><b>行业知识库</b><em>行业的通用信息，以对商文档为主</em></div><div class="ex"><div>8 月大促节奏时间及玩法规则</div><div>大促节奏和去年对标的时间</div></div><div class="gov"><span><b>来源</b><i>大促白皮书 · 内部群信息</i></span><span><b>体量</b><i>300 篇</i></span><span><b>更新</b><i>每天</i></span><span><b>维护</b><i>行业运营 ＋ 岗位 Agent 自动蒸馏</i></span><span><b>可见</b><i>全行业</i></span></div></section><section class="kbt"><div class="kbt-h"><span class="kidx">L2</span><b>岗位知识库</b><em>行业的政策、资源扶持等核心内容</em></div><div class="ex"><div>2026 天猫国际 618 店播资源</div><div>店播各类玩法和补贴</div></div><div class="gov"><span><b>来源</b><i>店播白皮书</i></span><span><b>体量</b><i>20 篇</i></span><span><b>更新</b><i>大促前 ＋ 每月</i></span><span><b>维护</b><i>渠道小二 ＋ 岗位 Agent 蒸馏</i></span><span><b>可见</b><i>按岗位</i></span></div></section><section class="kbt"><div class="kbt-h"><span class="kidx">L3</span><b>个人记忆画像</b><em>对应岗位的行业经验、商家判断、运营习惯</em></div><div class="ex"><div>Swisse 不参加百补、秒杀渠道</div><div>WHC 不参加淘客渠道</div></div><div class="memchips"><i>商家判断</i><i>运营习惯</i><i>常用数据口径</i><i>沟通偏好</i><i>踩过的坑</i></div><div class="gov"><span><b>来源</b><i>日常与 Agent 的交流 · 小二主动输入</i></span><span><b>体量</b><i>持续增加</i></span><span><b>更新</b><i>不定时</i></span><span><b>维护</b><i>岗位小二</i></span><span><b>可见</b><i>本人及上级</i></span></div></section></div>
+  <div class="tiers"><section class="kbt"><div class="kbt-h"><span class="kidx">L1</span><b>行业知识库</b><em>行业的通用信息，以对商文档为主</em></div><div class="ex"><div>8 月大促节奏时间及玩法规则</div><div>大促节奏和去年对标的时间</div></div><div class="gov"><span><b>来源</b><i>大促白皮书 · 内部群信息</i></span><span><b>体量</b><i>300 篇</i></span><span><b>更新</b><i>每天</i></span><span><b>维护</b><i>行业运营 ＋ 岗位 Agent 自动蒸馏</i></span><span><b>可见</b><i>全行业</i></span></div></section><section class="kbt"><div class="kbt-h"><span class="kidx">L2</span><b>岗位知识库</b><em>行业的政策、资源扶持等核心内容</em></div><div class="ex"><div>2026 年 8 月百补资源补贴政策</div><div>百补的不同玩法及补贴</div></div><div class="gov"><span><b>来源</b><i>大促资源政策文档</i></span><span><b>体量</b><i>20 篇</i></span><span><b>更新</b><i>大促前 ＋ 每月</i></span><span><b>维护</b><i>渠道小二 ＋ 岗位 Agent 蒸馏</i></span><span><b>可见</b><i>按岗位</i></span></div></section><section class="kbt"><div class="kbt-h"><span class="kidx">L3</span><b>个人记忆画像</b><em>对应岗位的行业经验、商家判断、运营习惯</em></div><div class="ex"><div>Swisse 不参加百补、秒杀渠道</div><div>WHC 不参加淘客渠道</div></div><div class="memchips"><i>商家判断</i><i>运营习惯</i><i>常用数据口径</i><i>沟通偏好</i><i>踩过的坑</i></div><div class="gov"><span><b>来源</b><i>日常与 Agent 的交流 · 小二主动输入</i></span><span><b>体量</b><i>持续增加</i></span><span><b>更新</b><i>不定时</i></span><span><b>维护</b><i>岗位小二</i></span><span><b>可见</b><i>本人及上级</i></span></div></section></div>
   <div class="wheel">
-    <svg viewBox="0 0 560 560" fill="none" aria-hidden="true">
-      <circle cx="280" cy="280" r="190" stroke="rgba(165,180,252,.32)" stroke-width="1.4"
+    <svg viewBox="0 0 520 520" fill="none" aria-hidden="true">
+      <circle cx="260" cy="260" r="175" stroke="rgba(165,180,252,.32)" stroke-width="1.4"
               stroke-dasharray="7 7"/>
     </svg>
     <div class="wc"><b>知识飞轮</b><em>用得越多，沉淀越厚，判断越准</em></div>
-    <div class="wa" style="left:392px;top:126px;transform:translate(-50%,-50%) rotate(36deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:461px;top:339px;transform:translate(-50%,-50%) rotate(108deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:280px;top:470px;transform:translate(-50%,-50%) rotate(180deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:99px;top:339px;transform:translate(-50%,-50%) rotate(252deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:168px;top:126px;transform:translate(-50%,-50%) rotate(324deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wn" style="left:280px;top:90px"><b>采集</b><em>白皮书 · 内部群 · Agent 交流</em></div><div class="wn key" style="left:461px;top:221px"><b>Agent 蒸馏</b><em>自动结构化入库</em></div><div class="wn" style="left:392px;top:434px"><b>分层供给</b><em>按权限分发到三层</em></div><div class="wn" style="left:168px;top:434px"><b>Agent 调用</b><em>在作战中心里被用起来</em></div><div class="wn" style="left:99px;top:221px"><b>回流沉淀</b><em>写回个人记忆画像</em></div>
+    <div class="wa" style="left:363px;top:118px;transform:translate(-50%,-50%) rotate(36deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:426px;top:314px;transform:translate(-50%,-50%) rotate(108deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:260px;top:435px;transform:translate(-50%,-50%) rotate(180deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:94px;top:314px;transform:translate(-50%,-50%) rotate(252deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:157px;top:118px;transform:translate(-50%,-50%) rotate(324deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wn" style="left:260px;top:85px"><b>采集</b><em>白皮书 · 内部群 · Agent 交流</em></div><div class="wn key" style="left:426px;top:206px"><b>Agent 蒸馏</b><em>自动结构化入库</em></div><div class="wn" style="left:363px;top:402px"><b>分层供给</b><em>按权限分发到三层</em></div><div class="wn" style="left:157px;top:402px"><b>Agent 调用</b><em>在作战中心里被用起来</em></div><div class="wn" style="left:94px;top:206px"><b>回流沉淀</b><em>写回个人记忆画像</em></div>
   </div>
 </div>
 <div class="kbfoot">
-  <p class="take"><em>知识库不是文档柜，是会自己长厚的组织资产。</em>
-    三层按权限隔离——行业通用的全行业共享，岗位政策按岗位可见，个人判断只对本人与上级开放；
-    人走了，对商家的判断留下来。</p>
+  <span class="chtag">一条真实的串联 · 示例</span>
+  <div class="chainrow">
+    <div class="ch d"><b>数据诊断</b><em>某商家 8 月销售出现缺口</em></div>
+    <div class="ch k"><b>L1 行业知识库</b><em>现在正处在 8 月大促节奏</em></div>
+    <div class="ch k"><b>L2 岗位知识库</b><em>有百补资源与补贴政策可给</em></div>
+    <div class="ch k"><b>L3 个人记忆画像</b><em>但 Swisse 不参加百补</em></div>
+    <div class="ch a"><b>运营动作</b><em>换其它资源触达，不空耗百补名额</em></div>
+  </div>
+  <p class="take"><em>没有知识库，Agent 只能说哪里跌了；有了它，才能说这个商家该给什么。</em>
+    三层按权限隔离——行业通用全行业共享、岗位政策按岗位可见、个人判断只对本人与上级开放；人走了，判断留下来。</p>
 </div>
 </div>
 </x-dc>
