@@ -19,12 +19,29 @@ EXPERTS = [
 ]
 BASE = [e[0] for e in EXPERTS if e[3]]
 SCENES = [
-    ('行业销售', '行业 GM',  1), ('竞对对比', '行业 GM',  1),
+    ('行业销售', '行业 GM',  1), ('竞对控比', '行业 GM',  1),
     ('行业损益', '行业 GM',  1), ('行业用户', '行业 GM',  1),
     ('品类规划', '品类组长', 1), ('商家复盘', '品类小二', 1),
     ('新商新品', '品类组长', 1), ('行业营销', '营销小二', 0),
 ]
-PRESET = {s: (list(BASE) if pre else []) for s, _, pre in SCENES}
+PRESET = {
+    '行业销售': ['组织协同','任务执行','数据官','知识官'],
+    '竞对控比': ['组织协同','任务执行','数据官','知识官','竞对情报','品类洞察'],
+    '行业损益': ['组织协同','任务执行','数据官','财务官'],
+    '行业用户': ['组织协同','任务执行','数据官','知识官','用户增长'],
+    '品类规划': ['组织协同','任务执行','数据官','知识官','竞对情报','外部咨询','品类洞察'],
+    '商家复盘': ['组织协同','任务执行','数据官','知识官','竞对情报','财务官','用户增长','品类洞察'],
+    '新商新品': ['组织协同','任务执行','数据官','知识官'],
+    '行业营销': ['组织协同','任务执行','知识官','营销创意','用户增长','品类洞察'],
+}
+SKILLS = [('target-data','销售追踪'), ('Kbsearch-tmg','知识调用'), ('cmr-tmg','损益管理'),
+          ('AI-data-qd','渠道取数'), ('AI-data-pl','品类取数'), ('Renwu-bj','任务找人'),
+          ('Zhenduan','明确任务')]
+SKPRESET = {
+    '组织协同': ['Zhenduan','Renwu-bj'], '任务执行': ['Renwu-bj'],
+    '数据官': ['target-data','AI-data-qd','AI-data-pl'], '知识官': ['Kbsearch-tmg'],
+    '财务官': ['cmr-tmg'],
+}
 
 def sid(s): return 's' + str([x[0] for x in SCENES].index(s))
 def eid(e): return 'e' + str([x[0] for x in EXPERTS].index(e))
@@ -36,6 +53,15 @@ gloss = ''.join(
 heads = ''.join(
     f'<div class="hc{" b" if base else ""}"><b>{fn}</b><span>{code}</span></div>'
     for fn, code, _, base in EXPERTS)
+
+skheads = ''.join(f'<div class="hc"><b>{c}</b><span>{d}</span></div>' for c, d in SKILLS)
+skrows = []
+for fn, code, _d, base in EXPERTS:
+    cs = ''.join(
+        f'<label class="cell"><input type="checkbox" data-owner="{fn}" data-skill="{c}"'
+        f'{" checked" if c in SKPRESET.get(fn, []) else ""}><span class="box"></span></label>'
+        for c, _n in SKILLS)
+    skrows.append(f'<div class="rl"><b>{fn}</b><span>{code}</span></div>' + cs)
 
 rows = []
 for scene, owner, _ in SCENES:
@@ -70,6 +96,9 @@ h2 span{{font-size:12px;font-weight:500;color:#9C8CCB;margin-left:10px}}
 .gx p{{margin-top:6px;font-size:11.5px;color:#9C8CCB;line-height:1.6}}
 .scroll{{overflow-x:auto;padding-bottom:4px}}
 .mx{{display:grid;grid-template-columns:186px repeat(10,minmax(96px,1fr));gap:0 4px;min-width:1180px}}
+.mx2{{display:grid;grid-template-columns:200px repeat(7,minmax(118px,1fr));gap:0 4px;min-width:1080px}}
+.mx2 .hc b{{font-family:'JetBrains Mono',monospace;font-size:12px}}
+.mx2 .rl span{{font-family:'JetBrains Mono',monospace}}
 .hc{{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;
     padding:10px 4px 10px;text-align:center;border-bottom:1px solid rgba(167,139,250,.26)}}
 .hc.b{{background:rgba(139,92,246,.12);border-radius:10px 10px 0 0}}
@@ -113,12 +142,12 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
 @media (max-width:900px){{.gloss{{grid-template-columns:repeat(2,1fr)}}.extra{{grid-template-columns:1fr}}}}
 </style>
 
-<script type="application/json" id="picks-state">{json.dumps({"picks": PRESET, "extra": ["", "", ""]}, ensure_ascii=False)}</script>
+<script type="application/json" id="picks-state">{json.dumps({"picks": PRESET, "extra": ["", "", ""], "skills": {fn: list(SKPRESET.get(fn, [])) for fn, _c, _d, _b in EXPERTS}, "skillExtra": ["", "", ""]}, ensure_ascii=False)}</script>
 
 <div class="wrap">
   <h1>专家团配置 · 请勾选</h1>
-  <p class="lead">每个作战中心需要哪些专家，在格子里点一下就行。<em>带底色的 4 个基础专家已按你说的预勾好</em>，
-    不用动；<em>行业营销整行是空的</em>，因为你说它是例外，麻烦手动勾。勾完点「保存勾选结果」，我这边直接就能读到。</p>
+  <p class="lead">两张表：上面是<em>作战中心需要哪些专家</em>（已按你上次勾的结果回填），下面是
+    <em>每个专家配哪些 Skill</em>（我按职能先勾了一部分，不对就改）。改完点「保存勾选结果」，我这边直接读。</p>
 
   <h2>专家说明<span>后 4 位是新增的，还没有代号；说明是我按名字先写的，不对就改</span></h2>
   <div class="gloss">{gloss}</div>
@@ -128,6 +157,18 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
     <div class="corner">作战中心 / 主导岗位</div>{heads}
     {''.join(rows)}
   </div></div>
+
+  <h2>每个专家配哪些 Skill<span>已按职能预勾了一部分，不对就改；空白的行是还没配 Skill 的专家</span></h2>
+  <div class="scroll"><div class="mx2">
+    <div class="corner">专家 / 代号</div>{skheads}
+    {''.join(skrows)}
+  </div></div>
+
+  <div class="extra">
+    <input id="k0" placeholder="补充 Skill 1，例如：huodong-tmg（活动报名）">
+    <input id="k1" placeholder="补充 Skill 2">
+    <input id="k2" placeholder="补充 Skill 3">
+  </div>
 
   <h2>还缺哪些专家？<span>填了会一起带给我</span></h2>
   <div class="extra">
@@ -148,8 +189,10 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
 (function () {{
   var PRISTINE = document.documentElement.outerHTML;
   var LS = 'tmg-expert-picks-v1';
-  var boxes = Array.prototype.slice.call(document.querySelectorAll('.cell input'));
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[data-scene]'));
+  var sboxes = Array.prototype.slice.call(document.querySelectorAll('input[data-owner]'));
   var xs = [document.getElementById('x0'), document.getElementById('x1'), document.getElementById('x2')];
+  var ks = [document.getElementById('k0'), document.getElementById('k1'), document.getElementById('k2')];
   var out = document.getElementById('out'), msg = document.getElementById('msg');
 
   function state() {{
@@ -158,7 +201,13 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
       if (!picks[b.dataset.scene]) picks[b.dataset.scene] = [];
       if (b.checked) picks[b.dataset.scene].push(b.dataset.exp);
     }});
-    return {{ picks: picks, extra: xs.map(function (i) {{ return i.value.trim(); }}) }};
+    var skills = {{}};
+    sboxes.forEach(function (b) {{
+      if (!skills[b.dataset.owner]) skills[b.dataset.owner] = [];
+      if (b.checked) skills[b.dataset.owner].push(b.dataset.skill);
+    }});
+    return {{ picks: picks, extra: xs.map(function (i) {{ return i.value.trim(); }}),
+             skills: skills, skillExtra: ks.map(function (i) {{ return i.value.trim(); }}) }};
   }}
   function apply(s) {{
     if (!s || !s.picks) return;
@@ -166,7 +215,12 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
       var list = s.picks[b.dataset.scene];
       if (list) b.checked = list.indexOf(b.dataset.exp) >= 0;
     }});
+    if (s.skills) sboxes.forEach(function (b) {{
+      var l = s.skills[b.dataset.owner];
+      if (l) b.checked = l.indexOf(b.dataset.skill) >= 0;
+    }});
     (s.extra || []).forEach(function (v, i) {{ if (xs[i]) xs[i].value = v || ''; }});
+    (s.skillExtra || []).forEach(function (v, i) {{ if (ks[i]) ks[i].value = v || ''; }});
   }}
   function text() {{
     var s = state(), lines = [];
@@ -175,6 +229,13 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
     }});
     var ex = s.extra.filter(Boolean);
     if (ex.length) lines.push('补充专家：' + ex.join(' / '));
+    lines.push('');
+    lines.push('—— 专家 × Skill ——');
+    Object.keys(s.skills).forEach(function (k) {{
+      lines.push(k + '｜' + (s.skills[k].length ? s.skills[k].join('  ') : '（待配）'));
+    }});
+    var kx = s.skillExtra.filter(Boolean);
+    if (kx.length) lines.push('补充 Skill：' + kx.join(' / '));
     return lines.join('\\n');
   }}
   function refresh() {{
@@ -188,7 +249,7 @@ pre{{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);borde
     else apply(JSON.parse(document.getElementById('picks-state').textContent));
   }} catch (e) {{}}
   refresh();
-  boxes.concat(xs).forEach(function (el) {{ el.addEventListener('input', refresh); }});
+  boxes.concat(sboxes, xs, ks).forEach(function (el) {{ el.addEventListener('input', refresh); }});
 
   document.getElementById('copy').addEventListener('click', function () {{
     var t = text();

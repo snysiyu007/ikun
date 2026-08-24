@@ -11,7 +11,7 @@ ROOT = pathlib.Path(__file__).resolve().parent
 CANVAS = ROOT / 'canvas'
 CANVAS.mkdir(exist_ok=True)
 
-SCENES = ['行业销售','竞对对比','行业损益','行业用户','品类规划','商家复盘','新商新品','行业营销']
+SCENES = ['行业销售','竞对控比','行业损益','行业用户','品类规划','商家复盘','新商新品','行业营销']
 ROLES  = ['行业 GM','品类组长','渠道组长','品类小二','渠道小二','用户小二','营销小二']
 EXPERTS= [('行业陈景润','数据官'),('行业藏书阁','知识库'),('行业猫头鹰','监视竞对'),
           ('行业葛朗台','财务官'),('行业秘书处','组织协同'),('行业王进喜','任务执行')]
@@ -22,7 +22,7 @@ KB = [('L1','行业知识库','行业的通用信息，以对商文档为主'),
       ('L2','岗位知识库','行业的政策、资源扶持等核心内容'),
       ('L3','个人记忆画像','对应岗位的行业经验、商家判断、运营习惯等和个人意识相关的信息，由 Agent 使用中沉淀回流')]
 
-TAGLINE = '以三层知识库为底座，叠加岗位 Agent 能力，把行业运营的工作做得更好'
+TAGLINE = '把岗位职责变成可复用的 Agent，把个人经验沉淀成组织资产'
 
 # violet = capability (scenes / agents / skills), indigo = knowledge
 CSS = """
@@ -310,7 +310,7 @@ EXPERT_COLS = [
 # 来自勾选页的实际配置
 PICKS = {
     '行业销售': ['组织协同','任务执行','数据官','知识官'],
-    '竞对对比': ['组织协同','任务执行','数据官','知识官','竞对情报','品类洞察'],
+    '竞对控比': ['组织协同','任务执行','数据官','知识官','竞对情报','品类洞察'],
     '行业损益': ['组织协同','任务执行','数据官','财务官'],
     '行业用户': ['组织协同','任务执行','数据官','知识官','用户增长'],
     '品类规划': ['组织协同','任务执行','数据官','知识官','竞对情报','外部咨询','品类洞察'],
@@ -318,9 +318,18 @@ PICKS = {
     '新商新品': ['组织协同','任务执行','数据官','知识官'],
     '行业营销': ['组织协同','任务执行','知识官','营销创意','用户增长','品类洞察'],
 }
-OWNERS = {'行业销售':'行业 GM','竞对对比':'行业 GM','行业损益':'行业 GM','行业用户':'行业 GM',
+OWNERS = {'行业销售':'行业 GM','竞对控比':'行业 GM','行业损益':'行业 GM','行业用户':'行业 GM',
           'x品类规划':'', '品类规划':'品类组长','商家复盘':'品类小二','新商新品':'品类组长','行业营销':'营销小二'}
 MATRIX_ROWS = [(sc, OWNERS[sc], {e: 1 for e in PICKS[sc]}) for sc in PICKS]
+EXPERT_SKILLS = {
+    '组织协同': ['Zhenduan', 'Renwu-bj'],
+    '任务执行': ['Renwu-bj'],
+    '数据官':   ['target-data', 'AI-data-qd', 'AI-data-pl'],
+    '知识官':   ['Kbsearch-tmg'],
+    '品类洞察': [], '竞对情报': [], '用户增长': [],
+    '财务官':   ['cmr-tmg'],
+    '外部咨询': [], '营销创意': [],
+}
 REUSE = {fn: sum(1 for sc in PICKS if fn in PICKS[sc]) for fn, _c, _k in EXPERT_COLS}
 FILLED = sum(len(v) for v in PICKS.values())
 AVG = round(FILLED / len(EXPERT_COLS), 1)
@@ -343,7 +352,7 @@ MATRIX_CSS = """
   .mx-r b{font-size:15px;font-weight:700}
   .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
              border-radius:999px;padding:1px 8px;align-self:flex-start}
-  .mx-c{display:flex;align-items:center;justify-content:center;min-height:68px;
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:60px;
       border-bottom:1px solid rgba(167,139,250,.13)}
   .mx-c.base{background:rgba(139,92,246,.10)}
   .m{width:22px;height:22px;border-radius:7px;display:block;
@@ -352,7 +361,14 @@ MATRIX_CSS = """
   .m.t{background:none;border:1px dashed rgba(167,139,250,.62);box-shadow:none}
   .mx-c.ft,.mx-r.ft{border-bottom:none;min-height:46px}
   .mx-c.ft{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:15px;font-weight:700;color:#C6B4F5}
-  .mx-c.ft.base{border-radius:0 0 9px 9px}
+  .mx-c.sk,.mx-r.sk{border-bottom:none;min-height:76px;align-items:flex-start;padding-top:9px}
+  .mx-c.sk{flex-direction:column;justify-content:flex-start;gap:4px}
+  .mx-c.sk.base{border-radius:0 0 9px 9px}
+  .mx-c.sk i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9.5px;
+             color:#D9CCFF;border:1px dashed rgba(167,139,250,.5);border-radius:5px;
+             padding:3px 6px;white-space:nowrap;letter-spacing:-.01em}
+  .mx-c.sk em{font-style:normal;font-size:10px;color:#7B6CA6}
+  .mx-r.sk{justify-content:flex-start;font-size:11px;color:#9C8CCB;letter-spacing:.06em}
   .mx-r.ft{justify-content:center;font-size:11px;color:#9C8CCB;letter-spacing:.06em;padding-top:4px}
   .mx-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:16px;
            padding-top:14px;border-top:1px solid rgba(167,139,250,.26)}
@@ -379,6 +395,11 @@ def matrix_body():
     cells.append('<div class="mx-r ft">被几个作战中心复用</div>')
     for name, _, kind in EXPERT_COLS:
         cells.append(f'<div class="mx-c ft {kind}">{REUSE[name]}</div>')
+    cells.append('<div class="mx-r sk">配置的 Skill</div>')
+    for name, _, kind in EXPERT_COLS:
+        sk = EXPERT_SKILLS.get(name) or []
+        inner = ''.join(f'<i>{k}</i>' for k in sk) if sk else '<em>待配</em>'
+        cells.append(f'<div class="mx-c sk {kind}">{inner}</div>')
     return f"""<div class="stage">
 <header class="deck-mast">
   <div class="brand">{MARK}<div><h1>场景 × 专家团 能力矩阵</h1>
@@ -390,7 +411,7 @@ def matrix_body():
   <div><p class="take">8 个作战中心、{FILLED} 个配置，全部由 <em>10 个专家</em>承担——
     平均每个专家被 <em>{AVG} 个场景复用</em>；组织协同、任务执行 8 场景全覆盖。
     新增一个作战中心，平均只要补 <em>1–2 个专属专家</em>。</p>
-    <p class="note">底色四列为基础专家；空格表示该场景暂不配置该专家。</p></div>
+    <p class="note">底色四列为基础专家；空格表示该场景暂不配置该专家。最下面一行 Skill 是按职能推的（虚线框），待确认。</p></div>
 </div>
 </div>"""
 
