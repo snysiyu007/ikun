@@ -1,7 +1,14 @@
-<title>专家的标准动作</title>
-<style>
-/*@FONTS@*/
-
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+  <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:#0C0918;
        background-image:radial-gradient(1200px 560px at 50% -10%,rgba(124,58,237,.22),transparent 70%),
@@ -138,30 +145,70 @@
   .stats b{display:block;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:22px;
            font-weight:700;color:#F6F2FF}
   .stats span{font-size:10.5px;color:#9C8CCB;letter-spacing:.04em}
-</style>
 
+  .kbwrap{display:grid;grid-template-columns:1fr 560px;gap:26px;align-items:center}
+  .tiers{display:flex;flex-direction:column;gap:17px}
+  .kbt{border:1px solid rgba(129,140,248,.45);border-radius:15px;background:rgba(67,56,202,.12);
+        padding:21px 20px 22px}
+  .kbt-h{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-bottom:14px}
+  .kbt-h b{font-size:17.5px;font-weight:700}
+  .kbt-h em{font-style:normal;font-size:12.5px;color:#9C8CCB}
+  .kidx{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;color:#D8DCFF;
+        border:1px solid rgba(216,220,255,.42);border-radius:5px;padding:2px 7px;flex:none}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .ex div{border-radius:11px;padding:18px 16px;font-size:15px;font-weight:700;
+          background:linear-gradient(180deg,#4C41C9,#2C2480);border:1px solid rgba(199,210,254,.26);
+          box-shadow:0 5px 14px rgba(23,18,80,.45),inset 0 1px 0 rgba(255,255,255,.14)}
+  .ex div:before{content:'「';color:rgba(216,220,255,.5)}
+  .ex div:after{content:'」';color:rgba(216,220,255,.5)}
+  .gov{display:flex;flex-wrap:wrap;gap:7px 18px;margin-top:14px;font-size:11.5px;color:#9C8CCB}
+  .gov span b{font-weight:500;color:#C7CCFF;margin-right:5px}
+  .gov span i{font-style:normal;color:#E2E4FF}
+  .memchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .memchips i{font-style:normal;font-size:11px;color:#DDE2FF;background:rgba(76,65,201,.34);
+              border:1px solid rgba(165,180,252,.34);border-radius:999px;padding:3px 10px}
+  .wheel{position:relative;width:560px;height:560px;margin:0 auto}
+  .wheel svg{position:absolute;inset:0}
+  .wn{position:absolute;transform:translate(-50%,-50%);width:172px;text-align:center;
+      border-radius:11px;padding:9px 8px;background:rgba(67,56,202,.30);
+      border:1px solid rgba(165,180,252,.42);backdrop-filter:blur(2px)}
+  .wn b{display:block;font-size:13px;font-weight:700}
+  .wn em{display:block;font-style:normal;font-size:10px;color:#B9BEEB;margin-top:2px;line-height:1.45}
+  .wn.key{background:linear-gradient(180deg,#6D6BE0,#3B32A6);border-color:rgba(255,255,255,.24);
+          box-shadow:0 6px 18px rgba(23,18,80,.5)}
+  .wn.key em{color:rgba(255,255,255,.78)}
+  .wc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:170px}
+  .wc b{display:block;font-size:21px;font-weight:700}
+  .wc em{display:block;font-style:normal;font-size:11.5px;color:#B9BEEB;margin-top:5px;line-height:1.5}
+  .wa{position:absolute;transform-origin:center;color:#8B90D8}
+  .kbfoot{margin-top:16px;padding-top:14px;border-top:1px solid rgba(129,140,248,.3);
+          display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
+  .kbfoot .take{max-width:1120px}
+</style>
+</helmet>
 <div class="stage">
 <header class="deck-mast">
-  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>每位专家手上的标准动作</h1>
-    <p class="claim">Skill 挂在专家身上，专家是岗位 Agent 的子 Agent——同一个动作被不同专家反复调用</p></div></div>
-  <div class="mlegend"><span>动作后的 ×N＝有几位专家在用同一个动作；卡内按复用次数排序，每张最多列 4 个</span></div>
+  <div class="brand"><svg class="mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="4" y="5" width="36" height="8" rx="3" fill="#9D55FF"/><rect x="9" y="17" width="26" height="8" rx="3" fill="#7A28E8"/><rect x="14" y="29" width="16" height="8" rx="3" fill="#5B1BB0"/></svg><div><h1>三层知识库 · 从散落文档到组织资产</h1>
+    <p class="claim">知识不只是被查——它被 Agent 蒸馏进来、被调用出去、再从使用里沉淀回来</p></div></div>
+  <div class="mlegend"><span>「」内为知识库里的真实条目</span></div>
 </header>
-<div class="chain">
-  <div class="cn"><b>岗位 Agent</b><em>7</em></div>
-  <div class="ca"><span>拆解为</span><svg width="22" height="9" viewBox="0 0 22 9" fill="none" aria-hidden="true"><path d="M0 4.5H16" stroke="#9C8CCB" stroke-width="1.1"/><path d="M15 1L21 4.5L15 8Z" fill="#9C8CCB"/></svg></div>
-  <div class="cn"><b>场景运营专家团</b><em>10</em></div>
-  <div class="ca"><span>配置</span><svg width="22" height="9" viewBox="0 0 22 9" fill="none" aria-hidden="true"><path d="M0 4.5H16" stroke="#9C8CCB" stroke-width="1.1"/><path d="M15 1L21 4.5L15 8Z" fill="#9C8CCB"/></svg></div>
-  <div class="cn here"><b>Skill</b><em>13</em><i>本页</i></div>
-</div>
-<div class="egrid"><div class="ec"><div class="ec-h"><b>组织协同</b><span>行业秘书处</span><i>8 个作战中心在用</i></div><div class="ec-s"><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>任务执行</b><span>行业王进喜</span><i>8 个作战中心在用</i></div><div class="ec-s"><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>数据官</b><span>行业陈景润</span><i>7 个作战中心在用</i></div><div class="ec-s"><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>target-data</b><em>销售追踪</em><u>×2</u></div><div><b>category-meeting</b><em>品类会议</em><u>×2</u></div><div><b>AI-data-qd</b><em>渠道取数</em><u>×1</u></div></div></div><div class="ec"><div class="ec-h"><b>知识官</b><span>行业藏书阁</span><i>7 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>品类洞察</b><span>待命名</span><i>4 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div class="more">… 还有 4 个</div></div></div><div class="ec"><div class="ec-h"><b>竞对情报</b><span>行业猫头鹰</span><i>3 个作战中心在用</i></div><div class="ec-s"><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>category-scan</b><em>品类扫描</em><u>×1</u></div><div><b>category-report</b><em>品类报告</em><u>×1</u></div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>用户增长</b><span>待命名</span><i>3 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-planning</b><em>品类规划</em><u>×2</u></div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>财务官</b><span>行业葛朗台</span><i>2 个作战中心在用</i></div><div class="ec-s"><div><b>cmr-tmg</b><em>损益管理</em><u>×1</u></div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>外部咨询</b><span>待命名</span><i>1 个作战中心在用</i></div><div class="ec-s"><div><b>AI-data-pl</b><em>品类取数</em><u>×4</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div><div class="slot">＋ 扩展位</div></div></div><div class="ec"><div class="ec-h"><b>营销创意</b><span>待命名</span><i>1 个作战中心在用</i></div><div class="ec-s"><div><b>Kbsearch-tmg</b><em>知识调用</em><u>×4</u></div><div><b>category-opportunity</b><em>品类机会</em><u>×4</u></div><div><b>Renwu-bj</b><em>任务找人</em><u>×3</u></div><div><b>Zhenduan</b><em>明确任务</em><u>×3</u></div></div></div></div>
-<div class="sfoot">
-  <p class="take"><em>Skill 不是员工技能，是岗位动作的最小可复用单元。</em>
-    能力不再长在某个人身上——13 个动作被 10 位专家调用 29 次，
-    新增一个作战中心，多数时候只是把现成的动作重新组合一次。</p>
-  <div class="stats">
-    <div><b>13</b><span>标准动作</span></div>
-    <div><b>29</b><span>被专家调用次数</span></div>
-    <div><b>2.2</b><span>平均每个动作复用</span></div>
+<div class="kbwrap">
+  <div class="tiers"><section class="kbt"><div class="kbt-h"><span class="kidx">L1</span><b>行业知识库</b><em>行业的通用信息，以对商文档为主</em></div><div class="ex"><div>8 月大促节奏时间及玩法规则</div><div>大促节奏和去年对标的时间</div></div><div class="gov"><span><b>来源</b><i>大促白皮书 · 内部群信息</i></span><span><b>体量</b><i>300 篇</i></span><span><b>更新</b><i>每天</i></span><span><b>维护</b><i>行业运营 ＋ 岗位 Agent 自动蒸馏</i></span><span><b>可见</b><i>全行业</i></span></div></section><section class="kbt"><div class="kbt-h"><span class="kidx">L2</span><b>岗位知识库</b><em>行业的政策、资源扶持等核心内容</em></div><div class="ex"><div>2026 天猫国际 618 店播资源</div><div>店播各类玩法和补贴</div></div><div class="gov"><span><b>来源</b><i>店播白皮书</i></span><span><b>体量</b><i>20 篇</i></span><span><b>更新</b><i>大促前 ＋ 每月</i></span><span><b>维护</b><i>渠道小二 ＋ 岗位 Agent 蒸馏</i></span><span><b>可见</b><i>按岗位</i></span></div></section><section class="kbt"><div class="kbt-h"><span class="kidx">L3</span><b>个人记忆画像</b><em>对应岗位的行业经验、商家判断、运营习惯</em></div><div class="ex"><div>Swisse 不参加百补、秒杀渠道</div><div>WHC 不参加淘客渠道</div></div><div class="memchips"><i>商家判断</i><i>运营习惯</i><i>常用数据口径</i><i>沟通偏好</i><i>踩过的坑</i></div><div class="gov"><span><b>来源</b><i>日常与 Agent 的交流 · 小二主动输入</i></span><span><b>体量</b><i>持续增加</i></span><span><b>更新</b><i>不定时</i></span><span><b>维护</b><i>岗位小二</i></span><span><b>可见</b><i>本人及上级</i></span></div></section></div>
+  <div class="wheel">
+    <svg viewBox="0 0 560 560" fill="none" aria-hidden="true">
+      <circle cx="280" cy="280" r="190" stroke="rgba(165,180,252,.32)" stroke-width="1.4"
+              stroke-dasharray="7 7"/>
+    </svg>
+    <div class="wc"><b>知识飞轮</b><em>用得越多，沉淀越厚，判断越准</em></div>
+    <div class="wa" style="left:392px;top:126px;transform:translate(-50%,-50%) rotate(36deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:461px;top:339px;transform:translate(-50%,-50%) rotate(108deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:280px;top:470px;transform:translate(-50%,-50%) rotate(180deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:99px;top:339px;transform:translate(-50%,-50%) rotate(252deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wa" style="left:168px;top:126px;transform:translate(-50%,-50%) rotate(324deg)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div><div class="wn" style="left:280px;top:90px"><b>采集</b><em>白皮书 · 内部群 · Agent 交流</em></div><div class="wn key" style="left:461px;top:221px"><b>Agent 蒸馏</b><em>自动结构化入库</em></div><div class="wn" style="left:392px;top:434px"><b>分层供给</b><em>按权限分发到三层</em></div><div class="wn" style="left:168px;top:434px"><b>Agent 调用</b><em>在作战中心里被用起来</em></div><div class="wn" style="left:99px;top:221px"><b>回流沉淀</b><em>写回个人记忆画像</em></div>
   </div>
 </div>
+<div class="kbfoot">
+  <p class="take"><em>知识库不是文档柜，是会自己长厚的组织资产。</em>
+    三层按权限隔离——行业通用的全行业共享，岗位政策按岗位可见，个人判断只对本人与上级开放；
+    人走了，对商家的判断留下来。</p>
 </div>
+</div>
+</x-dc>
+</body>
+</html>

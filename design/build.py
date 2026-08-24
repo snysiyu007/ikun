@@ -651,6 +651,131 @@ SHELF_BODY = shelf_body()
     encoding='utf-8')
 (CANVAS/'Shelf.dc.html').write_text(dc(MATRIX_CSS + SHELF_CSS, SHELF_BODY), encoding='utf-8')
 
+# ============================================ 汇报页 · 三层知识库
+import math
+
+KB_TIERS = [
+    ('L1', '行业知识库', '行业的通用信息，以对商文档为主',
+     ['8 月大促节奏时间及玩法规则', '大促节奏和去年对标的时间'],
+     [('来源', '大促白皮书 · 内部群信息'), ('体量', '300 篇'), ('更新', '每天'),
+      ('维护', '行业运营 ＋ 岗位 Agent 自动蒸馏'), ('可见', '全行业')], []),
+    ('L2', '岗位知识库', '行业的政策、资源扶持等核心内容',
+     ['2026 天猫国际 618 店播资源', '店播各类玩法和补贴'],
+     [('来源', '店播白皮书'), ('体量', '20 篇'), ('更新', '大促前 ＋ 每月'),
+      ('维护', '渠道小二 ＋ 岗位 Agent 蒸馏'), ('可见', '按岗位')], []),
+    ('L3', '个人记忆画像', '对应岗位的行业经验、商家判断、运营习惯',
+     ['Swisse 不参加百补、秒杀渠道', 'WHC 不参加淘客渠道'],
+     [('来源', '日常与 Agent 的交流 · 小二主动输入'), ('体量', '持续增加'), ('更新', '不定时'),
+      ('维护', '岗位小二'), ('可见', '本人及上级')],
+     ['商家判断', '运营习惯', '常用数据口径', '沟通偏好', '踩过的坑']),
+]
+WHEEL = [
+    ('采集', '白皮书 · 内部群 · Agent 交流'),
+    ('Agent 蒸馏', '自动结构化入库'),
+    ('分层供给', '按权限分发到三层'),
+    ('Agent 调用', '在作战中心里被用起来'),
+    ('回流沉淀', '写回个人记忆画像'),
+]
+
+KB_CSS = """
+  .kbwrap{display:grid;grid-template-columns:1fr 560px;gap:26px;align-items:center}
+  .tiers{display:flex;flex-direction:column;gap:17px}
+  .kbt{border:1px solid rgba(129,140,248,.45);border-radius:15px;background:rgba(67,56,202,.12);
+        padding:21px 20px 22px}
+  .kbt-h{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-bottom:14px}
+  .kbt-h b{font-size:17.5px;font-weight:700}
+  .kbt-h em{font-style:normal;font-size:12.5px;color:#9C8CCB}
+  .kidx{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;color:#D8DCFF;
+        border:1px solid rgba(216,220,255,.42);border-radius:5px;padding:2px 7px;flex:none}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .ex div{border-radius:11px;padding:18px 16px;font-size:15px;font-weight:700;
+          background:linear-gradient(180deg,#4C41C9,#2C2480);border:1px solid rgba(199,210,254,.26);
+          box-shadow:0 5px 14px rgba(23,18,80,.45),inset 0 1px 0 rgba(255,255,255,.14)}
+  .ex div:before{content:'「';color:rgba(216,220,255,.5)}
+  .ex div:after{content:'」';color:rgba(216,220,255,.5)}
+  .gov{display:flex;flex-wrap:wrap;gap:7px 18px;margin-top:14px;font-size:11.5px;color:#9C8CCB}
+  .gov span b{font-weight:500;color:#C7CCFF;margin-right:5px}
+  .gov span i{font-style:normal;color:#E2E4FF}
+  .memchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .memchips i{font-style:normal;font-size:11px;color:#DDE2FF;background:rgba(76,65,201,.34);
+              border:1px solid rgba(165,180,252,.34);border-radius:999px;padding:3px 10px}
+  .wheel{position:relative;width:560px;height:560px;margin:0 auto}
+  .wheel svg{position:absolute;inset:0}
+  .wn{position:absolute;transform:translate(-50%,-50%);width:172px;text-align:center;
+      border-radius:11px;padding:9px 8px;background:rgba(67,56,202,.30);
+      border:1px solid rgba(165,180,252,.42);backdrop-filter:blur(2px)}
+  .wn b{display:block;font-size:13px;font-weight:700}
+  .wn em{display:block;font-style:normal;font-size:10px;color:#B9BEEB;margin-top:2px;line-height:1.45}
+  .wn.key{background:linear-gradient(180deg,#6D6BE0,#3B32A6);border-color:rgba(255,255,255,.24);
+          box-shadow:0 6px 18px rgba(23,18,80,.5)}
+  .wn.key em{color:rgba(255,255,255,.78)}
+  .wc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:170px}
+  .wc b{display:block;font-size:21px;font-weight:700}
+  .wc em{display:block;font-style:normal;font-size:11.5px;color:#B9BEEB;margin-top:5px;line-height:1.5}
+  .wa{position:absolute;transform-origin:center;color:#8B90D8}
+  .kbfoot{margin-top:16px;padding-top:14px;border-top:1px solid rgba(129,140,248,.3);
+          display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
+  .kbfoot .take{max-width:1120px}
+"""
+
+def kb_body():
+    tiers = ''
+    for tag, name, desc, exs, gov, chips in KB_TIERS:
+        ex = ''.join(f'<div>{e}</div>' for e in exs)
+        gv = ''.join(f'<span><b>{k}</b><i>{v}</i></span>' for k, v in gov)
+        mc = ('<div class="memchips">' + ''.join(f'<i>{c}</i>' for c in chips) + '</div>') if chips else ''
+        tiers += (f'<section class="kbt"><div class="kbt-h"><span class="kidx">{tag}</span>'
+                  f'<b>{name}</b><em>{desc}</em></div>'
+                  f'<div class="ex">{ex}</div>{mc}<div class="gov">{gv}</div></section>')
+
+    C, R = 280, 190
+    nodes = ''
+    for i, (t, sub) in enumerate(WHEEL):
+        a = math.radians(-90 + i * 72)
+        x, y = C + R * math.cos(a), C + R * math.sin(a)
+        key = ' key' if t == 'Agent 蒸馏' else ''
+        nodes += (f'<div class="wn{key}" style="left:{x:.0f}px;top:{y:.0f}px">'
+                  f'<b>{t}</b><em>{sub}</em></div>')
+    arrows = ''
+    for i in range(5):
+        a = math.radians(-90 + i * 72 + 36)
+        x, y = C + R * math.cos(a), C + R * math.sin(a)
+        rot = -90 + i * 72 + 36 + 90
+        arrows += (f'<div class="wa" style="left:{x:.0f}px;top:{y:.0f}px;'
+                   f'transform:translate(-50%,-50%) rotate({rot:.0f}deg)">'
+                   f'<svg width="13" height="13" viewBox="0 0 13 13" fill="none">'
+                   f'<path d="M1 1L11 6.5L1 12Z" fill="currentColor"/></svg></div>')
+
+    return f"""<div class="stage">
+<header class="deck-mast">
+  <div class="brand">{MARK}<div><h1>三层知识库 · 从散落文档到组织资产</h1>
+    <p class="claim">知识不只是被查——它被 Agent 蒸馏进来、被调用出去、再从使用里沉淀回来</p></div></div>
+  <div class="mlegend"><span>「」内为知识库里的真实条目</span></div>
+</header>
+<div class="kbwrap">
+  <div class="tiers">{tiers}</div>
+  <div class="wheel">
+    <svg viewBox="0 0 560 560" fill="none" aria-hidden="true">
+      <circle cx="280" cy="280" r="190" stroke="rgba(165,180,252,.32)" stroke-width="1.4"
+              stroke-dasharray="7 7"/>
+    </svg>
+    <div class="wc"><b>知识飞轮</b><em>用得越多，沉淀越厚，判断越准</em></div>
+    {arrows}{nodes}
+  </div>
+</div>
+<div class="kbfoot">
+  <p class="take"><em>知识库不是文档柜，是会自己长厚的组织资产。</em>
+    三层按权限隔离——行业通用的全行业共享，岗位政策按岗位可见，个人判断只对本人与上级开放；
+    人走了，对商家的判断留下来。</p>
+</div>
+</div>"""
+
+KB_BODY = kb_body()
+(ROOT/'tmg-kb.html').write_text(
+    f'<title>三层知识库</title>\n<style>\n/*@FONTS@*/\n{CSS}{MATRIX_CSS}{SHELF_CSS}{KB_CSS}</style>\n\n{KB_BODY}\n',
+    encoding='utf-8')
+(CANVAS/'KB.dc.html').write_text(dc(MATRIX_CSS + SHELF_CSS + KB_CSS, KB_BODY), encoding='utf-8')
+
 canvas = {
  "pages":[{"id":"page-1","name":"汇报页"},{"id":"page-2","name":"其它排版方向"}],
  "artboards":[
@@ -658,17 +783,18 @@ canvas = {
   {"file":"Matrix.dc.html","title":"P2 · 场景 × 专家团","page":"page-1","x":1760,"y":0,"w":1600,"h":900},
   {"file":"Shelf.dc.html","title":"P3 · 专家的标准动作","page":"page-1","x":3520,"y":0,"w":1600,"h":900},
   {"file":"SalesFlow.dc.html","title":"P4 · 行业销售端到端","page":"page-1","x":5280,"y":0,"w":1600,"h":900},
+  {"file":"KB.dc.html","title":"P5 · 三层知识库","page":"page-1","x":7040,"y":0,"w":1600,"h":900},
   {"file":"Enclosure.dc.html","title":"方向二 · 环抱式","page":"page-2","x":0,"y":0,"w":1600,"h":900},
   {"file":"Granularity.dc.html","title":"方向三 · 粒度阶梯","page":"page-2","x":1760,"y":0,"w":1600,"h":900},
   {"file":"Rail.dc.html","title":"方向四 · 横向流水线","page":"page-2","x":3520,"y":0,"w":1600,"h":830}
  ],
  "annotations":[
-  {"id":"note-p3","page":"page-1","x":3520,"y":-160,"w":520,
-   "text":"P3 改成按专家组织：顶部链路条把 岗位 Agent → 专家 → Skill 串起来，卡片头部的「N 个作战中心在用」和 P2 底部的复用计数是同一组数。\\n中文动作名是我按代号字面写的，要改直接说。"},
+  {"id":"note-p5","page":"page-1","x":7040,"y":-160,"w":520,
+   "text":"P5 全部用你填的真实内容。质量指标你留空了，所以没画那一块。\\n品牌名我规范成了 Swisse / WHC。"},
   {"id":"note-alts","page":"page-2","x":0,"y":-120,"w":460,
    "text":"没有选中的三个排版方向，留作参考。"}
  ],
  "launch":{"view":"canvas","page":"page-1"}
 }
 (CANVAS/'canvas.json').write_text(json.dumps(canvas, ensure_ascii=False, indent=1), encoding='utf-8')
-print('rebuilt')
+print('built KB page')
