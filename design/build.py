@@ -324,14 +324,15 @@ MATRIX_ROWS = [(sc, OWNERS[sc], {e: 1 for e in PICKS[sc]}) for sc in PICKS]
 EXPERT_SKILLS = {   # 来自勾选页
     '组织协同': ['Renwu-bj', 'Zhenduan'],
     '任务执行': ['Renwu-bj'],
-    '数据官':   ['target-data', 'AI-data-qd', 'AI-data-pl'],
+    '数据官':   ['target-data', 'AI-data-qd', 'AI-data-pl', 'category-meeting'],
     '知识官':   ['Kbsearch-tmg'],
-    '品类洞察': ['target-data', 'Kbsearch-tmg', 'AI-data-pl'],
-    '竞对情报': [],
-    '用户增长': ['Kbsearch-tmg', 'AI-data-pl'],
+    '品类洞察': ['target-data', 'Kbsearch-tmg', 'AI-data-pl', 'category-planning',
+                'category-opportunity', 'category-bd', 'category-meeting'],
+    '竞对情报': ['category-scan', 'category-opportunity', 'category-report'],
+    '用户增长': ['Kbsearch-tmg', 'AI-data-pl', 'category-planning'],
     '财务官':   ['cmr-tmg'],
-    '外部咨询': ['AI-data-pl', 'Zhenduan'],
-    '营销创意': ['Kbsearch-tmg', 'Renwu-bj', 'Zhenduan'],
+    '外部咨询': ['AI-data-pl', 'Zhenduan', 'category-opportunity'],
+    '营销创意': ['Kbsearch-tmg', 'Renwu-bj', 'Zhenduan', 'category-opportunity'],
 }
 SKILL_CN = {
     'target-data': '销售追踪', 'Kbsearch-tmg': '知识调用', 'cmr-tmg': '损益管理',
@@ -551,26 +552,38 @@ FLOW_BODY = flow_body()
     encoding='utf-8')
 (CANVAS/'SalesFlow.dc.html').write_text(dc(MATRIX_CSS + FLOW_CSS, FLOW_BODY), encoding='utf-8')
 
-# ============================================ 汇报页 · Skill 能力货架
+# ============================================ 汇报页 · Skill（按专家组织）
 SHELF_CSS = """
-  .shelf{display:grid;grid-template-columns:162px repeat(6,1fr);gap:12px}
-  .dl{display:flex;flex-direction:column;justify-content:center;gap:5px;padding-right:14px;
-      border-right:1px solid rgba(167,139,250,.22)}
-  .dl b{font-size:16.5px;font-weight:700;letter-spacing:.02em}
-  .dl em{font-style:normal;font-size:11px;color:#9C8CCB;line-height:1.5}
-  .dl i{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;
-        color:#C6B4F5;border:1px solid rgba(167,139,250,.45);border-radius:5px;
-        padding:1px 6px;align-self:flex-start}
-  .sc{border-radius:12px;padding:13px 14px;min-height:104px;display:flex;flex-direction:column;
-      background:linear-gradient(180deg,#9D55FF,#7A28E8);border:1px solid rgba(255,255,255,.16);
-      box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24)}
-  .sc b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;font-weight:500;
-        color:rgba(255,255,255,.86);letter-spacing:-.01em}
-  .sc em{font-style:normal;font-size:16px;font-weight:700;margin-top:4px}
-  .sc span{margin-top:auto;padding-top:8px;font-size:10.5px;color:rgba(255,255,255,.74);line-height:1.5}
-  .sc.free span{color:#E9DCFF}
-  .slot{border-radius:12px;border:1px dashed rgba(167,139,250,.4);display:flex;
-        align-items:center;justify-content:center;font-size:12px;color:#7B6CA6}
+  .chain{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .cn{border:1px dashed rgba(167,139,250,.4);border-radius:11px;padding:9px 16px;
+      display:flex;align-items:baseline;gap:9px;background:rgba(139,92,246,.04)}
+  .cn b{font-size:14.5px;font-weight:700;color:#C6B4F5}
+  .cn em{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;
+         font-size:12px;color:#9C8CCB}
+  .cn.here{border-style:solid;border-color:rgba(255,255,255,.18);
+           background:linear-gradient(180deg,#9D55FF,#7A28E8);
+           box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24)}
+  .cn.here b{color:#fff}
+  .cn.here em{color:rgba(255,255,255,.78)}
+  .cn.here i{font-style:normal;font-size:11px;color:rgba(255,255,255,.72);margin-left:2px}
+  .ca{font-size:10.5px;color:#9C8CCB;letter-spacing:.1em;display:flex;align-items:center;gap:7px}
+  .egrid{column-count:5;column-gap:13px}
+  .ec{border:1px solid rgba(167,139,250,.3);border-radius:14px;background:rgba(139,92,246,.05);
+      padding:0 0 12px;break-inside:avoid;margin-bottom:13px;display:inline-block;width:100%}
+  .ec-h{padding:12px 14px 11px;border-bottom:1px solid rgba(167,139,250,.22)}
+  .ec-h b{display:block;font-size:16px;font-weight:700}
+  .ec-h span{display:block;font-size:10.5px;color:#9C8CCB;margin-top:2px}
+  .ec-h i{display:inline-block;font-style:normal;margin-top:7px;font-size:10.5px;color:#C6B4F5;
+          border:1px solid rgba(167,139,250,.42);border-radius:999px;padding:1px 8px}
+  .ec-s{display:flex;flex-direction:column;gap:5px;padding:11px 12px 0}
+  .ec-s div{display:flex;align-items:baseline;gap:7px;border-radius:8px;padding:5px 8px;
+            background:linear-gradient(180deg,rgba(157,85,255,.34),rgba(122,40,232,.24));
+            border:1px solid rgba(167,139,250,.3)}
+  .ec-s b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;font-weight:500;
+          color:#EFE6FF;letter-spacing:-.02em}
+  .ec-s em{font-style:normal;font-size:11.5px;color:#F6F2FF;font-weight:700;white-space:nowrap}
+  .ec-s u{margin-left:auto;text-decoration:none;font-family:'JetBrains Mono',ui-monospace,monospace;
+          font-size:10px;color:#B9A9E8}
   .sfoot{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-top:18px;
          padding-top:15px;border-top:1px solid rgba(167,139,250,.26)}
   .sfoot .take{max-width:1080px}
@@ -581,41 +594,50 @@ SHELF_CSS = """
   .stats span{font-size:10.5px;color:#9C8CCB;letter-spacing:.04em}
 """
 
+def arrow_r(label):
+    return (f'<div class="ca"><span>{label}</span>'
+            f'<svg width="22" height="9" viewBox="0 0 22 9" fill="none" aria-hidden="true">'
+            f'<path d="M0 4.5H16" stroke="#9C8CCB" stroke-width="1.1"/>'
+            f'<path d="M15 1L21 4.5L15 8Z" fill="#9C8CCB"/></svg></div>')
+
 def shelf_body():
-    rows = []
-    for name, desc, ks in DOMAINS:
-        rows.append(f'<div class="dl"><b>{name}</b><em>{desc}</em><i>{len(ks)}</i></div>')
-        for k in ks:
-            users = SKILL_USERS[k]
-            who = ' · '.join(users) if users else '待分配到专家'
-            free = '' if users else ' free'
-            rows.append(f'<div class="sc{free}"><b>{k}</b><em>{SKILL_CN[k]}</em>'
-                        f'<span>{who}</span></div>')
-        if len(ks) < 6:
-            span = 6 - len(ks)
-            rows.append(f'<div class="slot" style="grid-column:span {span}">＋ 扩展位</div>')
+    cards = []
+    for fn, code, _kind in EXPERT_COLS:
+        ks = EXPERT_SKILLS.get(fn) or []
+        lines = ''.join(
+            f'<div><b>{k}</b><em>{SKILL_CN[k]}</em><u>×{len(SKILL_USERS[k])}</u></div>' for k in ks)
+        cards.append(f'<div class="ec"><div class="ec-h"><b>{fn}</b><span>{code}</span>'
+                     f'<i>{REUSE[fn]} 个作战中心在用</i></div>'
+                     f'<div class="ec-s">{lines}</div></div>')
     return f"""<div class="stage">
 <header class="deck-mast">
-  <div class="brand">{MARK}<div><h1>Skill · 岗位动作的最小复用单元</h1>
-    <p class="claim">把岗位的 SOP 拆成标准动作——写得下来、调得动、审计得了，任何岗位 Agent 都能用同一个动作</p></div></div>
-  <div class="mlegend"><span>卡片下方是「谁在用」这个动作</span></div>
+  <div class="brand">{MARK}<div><h1>每位专家手上的标准动作</h1>
+    <p class="claim">Skill 挂在专家身上，专家是岗位 Agent 的子 Agent——同一个动作被不同专家反复调用</p></div></div>
+  <div class="mlegend"><span>动作后面的 ×N＝有几位专家在用同一个动作</span></div>
 </header>
-<div class="shelf">{''.join(rows)}</div>
+<div class="chain">
+  <div class="cn"><b>岗位 Agent</b><em>7</em></div>
+  {arrow_r('拆解为')}
+  <div class="cn"><b>场景运营专家团</b><em>10</em></div>
+  {arrow_r('配置')}
+  <div class="cn here"><b>Skill</b><em>{len(SKILL_CN)}</em><i>本页</i></div>
+</div>
+<div class="egrid">{''.join(cards)}</div>
 <div class="sfoot">
   <p class="take"><em>Skill 不是员工技能，是岗位动作的最小可复用单元。</em>
-    能力不再长在某个人身上——同一个动作被不同岗位、不同专家反复调用；
+    能力不再长在某个人身上——{len(SKILL_CN)} 个动作被 10 位专家调用 {CALLS} 次，
     新增一个作战中心，多数时候只是把现成的动作重新组合一次。</p>
   <div class="stats">
     <div><b>{len(SKILL_CN)}</b><span>标准动作</span></div>
-    <div><b>{len(DOMAINS)}</b><span>能力域</span></div>
     <div><b>{CALLS}</b><span>被专家调用次数</span></div>
+    <div><b>{round(CALLS / len(SKILL_CN), 1)}</b><span>平均每个动作复用</span></div>
   </div>
 </div>
 </div>"""
 
 SHELF_BODY = shelf_body()
 (ROOT/'tmg-skill-shelf.html').write_text(
-    f'<title>Skill 能力货架</title>\n<style>\n/*@FONTS@*/\n{CSS}{MATRIX_CSS}{SHELF_CSS}</style>\n\n{SHELF_BODY}\n',
+    f'<title>专家的标准动作</title>\n<style>\n/*@FONTS@*/\n{CSS}{MATRIX_CSS}{SHELF_CSS}</style>\n\n{SHELF_BODY}\n',
     encoding='utf-8')
 (CANVAS/'Shelf.dc.html').write_text(dc(MATRIX_CSS + SHELF_CSS, SHELF_BODY), encoding='utf-8')
 
@@ -624,7 +646,7 @@ canvas = {
  "artboards":[
   {"file":"Main.dc.html","title":"P1 · 平台总架构","page":"page-1","x":0,"y":0,"w":1600,"h":900},
   {"file":"Matrix.dc.html","title":"P2 · 场景 × 专家团","page":"page-1","x":1760,"y":0,"w":1600,"h":900},
-  {"file":"Shelf.dc.html","title":"P3 · Skill 能力货架","page":"page-1","x":3520,"y":0,"w":1600,"h":900},
+  {"file":"Shelf.dc.html","title":"P3 · 专家的标准动作","page":"page-1","x":3520,"y":0,"w":1600,"h":900},
   {"file":"SalesFlow.dc.html","title":"P4 · 行业销售端到端","page":"page-1","x":5280,"y":0,"w":1600,"h":900},
   {"file":"Enclosure.dc.html","title":"方向二 · 环抱式","page":"page-2","x":0,"y":0,"w":1600,"h":900},
   {"file":"Granularity.dc.html","title":"方向三 · 粒度阶梯","page":"page-2","x":1760,"y":0,"w":1600,"h":900},
@@ -632,11 +654,11 @@ canvas = {
  ],
  "annotations":[
   {"id":"note-p3","page":"page-1","x":3520,"y":-160,"w":520,
-   "text":"P3 是新加的 Skill 页。6 个 category-* 动作还没挂到专家上，卡片下方写的是「待分配到专家」。\\n中文名是我按代号字面写的，要改直接说。"},
+   "text":"P3 改成按专家组织：顶部链路条把 岗位 Agent → 专家 → Skill 串起来，卡片头部的「N 个作战中心在用」和 P2 底部的复用计数是同一组数。\\n中文动作名是我按代号字面写的，要改直接说。"},
   {"id":"note-alts","page":"page-2","x":0,"y":-120,"w":460,
    "text":"没有选中的三个排版方向，留作参考。"}
  ],
  "launch":{"view":"canvas","page":"page-1"}
 }
 (CANVAS/'canvas.json').write_text(json.dumps(canvas, ensure_ascii=False, indent=1), encoding='utf-8')
-print('built:', ', '.join(sorted(p.name for p in CANVAS.iterdir())))
+print('rebuilt')
