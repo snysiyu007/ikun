@@ -1,3 +1,14 @@
+# ikun — Claude Code Skills
+
+两个自用的 Claude Code Skill。
+
+| Skill | 作用 | 安装位置 |
+|-------|------|----------|
+| **wechat-article**（本页） | 抓取微信公众号文章，AI 总结后归档到 Obsidian | `~/.claude/skills/wechat-article/` |
+| **[video-polish](video-polish/)** | 把口播原片剪成竖屏短视频成片（零素材、只靠 ffmpeg） | `~/.claude/skills/video-polish/` |
+
+---
+
 # wechat-article
 
 一个 Claude Code Skill，自动抓取微信公众号文章，AI 总结后归档到 Obsidian。
@@ -62,6 +73,15 @@ mkdir -p ~/.claude/skills && git clone https://github.com/snysiyu007/ikun.git ~/
 - 微信 UA 可能失效，需要不定期更新 SKILL.md 中的 UA 字符串
 - 文章中的图片无法提取
 - 部分被反爬拦截的文章需要手动复制内容
+
+## video-polish 安装
+
+```bash
+git clone https://github.com/snysiyu007/ikun.git /tmp/ikun-skills
+cp -r /tmp/ikun-skills/video-polish ~/.claude/skills/video-polish
+```
+
+用法见 [video-polish/README.md](video-polish/README.md)。
 
 ## License
 
