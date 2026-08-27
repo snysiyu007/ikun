@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""渲染与字幕共用的时间轴处理。"""
+"""渲染与字幕共用的时间轴处理和路径转义。"""
+
+
+def esc_path(p):
+    """ffmpeg 滤镜里的路径要转义反斜杠、冒号和单引号。"""
+    return p.replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
 
 
 def quantize(segments, fps):

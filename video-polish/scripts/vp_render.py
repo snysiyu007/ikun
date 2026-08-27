@@ -14,18 +14,13 @@ import shlex
 import subprocess
 import sys
 
-from vp_common import quantize
+from vp_common import esc_path, quantize
 
 DEF_LOOK = {"denoise": "2:1:3:3", "sharpen": 0.55, "brightness": 0.025,
             "contrast": 1.10, "saturation": 1.10, "gamma": 1.0, "skin_smooth": 0.0}
 DEF_AUDIO = {"highpass": 85, "denoise": True, "denoise_amount": 10,
              "presence": 3.0, "mud_cut": -2.0, "compress": True,
              "lufs": -14.0, "true_peak": -1.5, "fade_ms": 15}
-
-
-def esc_path(p):
-    """ffmpeg filter 里的路径需要转义 : 和 \\ 和 '。"""
-    return p.replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
 
 
 def build_video_chain(look, seg_zoom, crop, size):

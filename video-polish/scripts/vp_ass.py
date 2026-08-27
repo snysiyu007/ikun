@@ -18,7 +18,7 @@ import subprocess
 import sys
 import tempfile
 
-from vp_common import timeline
+from vp_common import esc_path, timeline
 
 CJK_PUNCT = "，。？！；：、,.?!;:…—"
 NO_BREAK_BEFORE = "，。？！；：、,.?!;:）】》」』…"
@@ -53,7 +53,7 @@ def measure_width(font, size, sample, W, H, fonts_dir=None):
     with open(ap, "w", encoding="utf-8") as f:
         f.write(PROBE_ASS.format(w=W, h=H, font=font, size=size,
                                  spacing=round(size * 0.02), text=sample))
-    vf = f"subtitles='{esc_ass_path(ap)}'" + (f":fontsdir='{esc_ass_path(fonts_dir)}'" if fonts_dir else "")
+    vf = f"subtitles='{esc_path(ap)}'" + (f":fontsdir='{esc_path(fonts_dir)}'" if fonts_dir else "")
     r = subprocess.run(["ffmpeg", "-v", "error", "-f", "lavfi",
                         "-i", f"color=c=black:s={W}x{H}:d=1:r=1",
                         "-vf", vf + ",format=gray", "-frames:v", "1",
@@ -84,10 +84,6 @@ def autofit(font, W, H, units, fill, fonts_dir=None, base=100):
     if not w:
         return None
     return int(round(base * (W * fill) / w))
-
-
-def esc_ass_path(p):
-    return p.replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
 
 
 def to_ass_color(hex_rgb, alpha="00"):
