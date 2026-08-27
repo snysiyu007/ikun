@@ -88,6 +88,7 @@ python3 $VP/vp_render.py plan.json
 | `scripts/vp_plan.py` | 选段 → 剔停顿 → 分配变焦 → 生成 plan.json |
 | `scripts/vp_ass.py` | 文案时间轴 → 竖屏风格 ASS 字幕，自动重新对时 |
 | `scripts/vp_render.py` | 按 plan.json 渲染成片和封面 |
+| `scripts/vp_common.py` | 渲染与字幕共用的帧对齐时间轴 |
 
 ## plan.json
 
@@ -105,7 +106,7 @@ python3 $VP/vp_render.py plan.json
           "contrast": 1.10, "saturation": 1.10, "skin_smooth": 0},
  "audio": {"highpass": 85, "denoise": true, "presence": 3.0,
            "compress": true, "lufs": -14.0, "fade_ms": 15},
- "subtitle_style": {"font": "PingFang SC", "size": 76, "margin_v": 432,
+ "subtitle_style": {"font": "PingFang SC", "fill": 0.78, "margin_v": 432,
                     "accent": "#FFD400", "max_chars": 12, "pop": true},
  "subtitles": "成片.ass",
  "overlays": [
@@ -130,6 +131,16 @@ python3 $VP/vp_render.py plan.json
 5. **光源放在脸前方**，不要在背后。窗边正对窗户拍，或买一盏补光灯。
 6. **开头三句话直接进主题**。"大家好""今天想聊聊""现在几点了"这类开场，后期只能删掉。
 7. **一条只讲一件事**，控制在 60~90 秒。素材长了可以拆，但一条里塞三个主题救不回来。
+
+## 关于字号
+
+`subtitle_style.size` 是名义字号，**不等于**屏幕上的实际字面大小——libass 按字体的
+hhea 度量缩放，同一个数字在 PingFang SC、微软雅黑、Noto Sans SC 下能差三成。
+
+所以 `vp_ass.py` 默认会先渲染一帧探针、实测墨迹宽度，再反推字号，让"满一行"正好占
+画面宽度的 `fill`（默认 0.78，竖屏短视频的常见比例）。换字体不用重新调数字。
+
+想手动锁死字号就传 `--size 96`，或加 `--no-autofit`。
 
 ## 已知限制
 

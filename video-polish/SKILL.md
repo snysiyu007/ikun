@@ -120,7 +120,11 @@ python3 $VP/vp_ass.py plan.json --segments segments.json --out 成片.ass
 ```
 
 时间轴会自动按 `plan.json` 保留的片段重新对齐，不需要手工算。
-样式参数在 `plan.json` 的 `subtitle_style` 里：`font` / `size` / `margin_v` / `accent` / `max_chars`。
+样式参数在 `plan.json` 的 `subtitle_style` 里：`font` / `fill` / `margin_v` / `accent` / `max_chars`。
+
+**字号是自动实测的**：libass 按字体 hhea 度量缩放，同一个 `size` 数字在不同中文字体下
+实际字面能差三成。脚本会先渲染一帧探针量出真实墨迹宽度，再反推字号，让满一行正好占
+画面宽度的 `fill`（默认 0.78）。换字体不用重调数字；要手动锁死就传 `--size 96`。
 
 字体按平台选，取第一个装了的：
 - macOS：`PingFang SC`
@@ -168,7 +172,8 @@ ffmpeg -hide_banner -nostats -i 成片.mp4 -af ebur128=peak=true -f null - 2>&1 
 
 - **ffmpeg 报 "No such filter"**：版本太老，需要 ffmpeg 5 以上。
 - **字幕不显示或变成方块**：`subtitle_style.font` 写的字体没装。用 `fc-list`（macOS/Linux）
-  或系统字体册确认，换成实际装了的中文字体名。
+  或系统字体册确认，换成实际装了的中文字体名。字体没装时实测会退回名义字号，
+  终端会打印"字体宽度实测失败"，看到这句就说明字体名写错了。
 - **切点有爆音**：调大 `audio.fade_ms`（默认 15，可以到 25）。
 - **画面糊**：源码率太低，降低 `--headroom-trim` 少裁一点，或直接输出 720x1280。
 - **找不到烧录字幕带**：`--no-scan` 跳过扫描，用 `--crop` 手动给裁切框。
