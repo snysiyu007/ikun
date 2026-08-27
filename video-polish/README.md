@@ -106,7 +106,7 @@ python3 $VP/vp_render.py plan.json
  "look": {"denoise": "2:1:3:3", "sharpen": 0.55, "brightness": 0.025,
           "contrast": 1.10, "saturation": 1.10, "skin_smooth": 0},
  "audio": {"highpass": 85, "denoise": true, "presence": 3.0,
-           "compress": true, "lufs": -14.0, "fade_ms": 15},
+           "compress": true, "lufs": -14.0, "fade_ms": 15, "bitrate": "192k"},
  "subtitle_style": {"font": "PingFang SC", "fill": 0.78, "margin_v": 432,
                     "accent": "#FFD400", "max_chars": 12, "pop": true},
  "subtitles": "成片.ass",

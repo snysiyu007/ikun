@@ -21,7 +21,7 @@ DEF_LOOK = {"denoise": "2:1:3:3", "sharpen": 0.55, "brightness": 0.025,
             "contrast": 1.10, "saturation": 1.10, "gamma": 1.0, "skin_smooth": 0.0}
 DEF_AUDIO = {"highpass": 85, "denoise": True, "denoise_amount": 10,
              "presence": 3.0, "mud_cut": -2.0, "compress": True,
-             "lufs": -14.0, "true_peak": -1.5, "fade_ms": 15}
+             "lufs": -14.0, "true_peak": -1.5, "fade_ms": 15, "bitrate": "192k"}
 
 
 def source_time(segs, t_out):
@@ -190,7 +190,8 @@ def main():
            "-c:v", "libx264", "-preset", plan.get("preset", "slow"), "-crf", str(crf),
            "-profile:v", "high", "-level", "4.1", "-pix_fmt", "yuv420p",
            "-x264-params", "keyint=60:min-keyint=30:scenecut=0",
-           "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
+           "-c:a", "aac", "-ar", "48000", "-ac", "2",
+           "-b:a", str({**DEF_AUDIO, **plan.get("audio", {})}["bitrate"]),
            "-movflags", "+faststart"]
     if args.preview:
         cmd += ["-t", str(args.preview)]
