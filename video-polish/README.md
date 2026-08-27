@@ -14,7 +14,7 @@
 | 节奏 | 自动剔除段内停顿，通常压掉 10%~15% 时长 |
 | 镜头 | 逐段轮换变焦，单机位口播也有"多机位"感 |
 | 配图 | 把关键概念做成整屏图卡切进去，矢量图标 + 无头浏览器排版，零素材 |
-| 换背景 | 抠出人像换掉整个背景，自带书架 / 棚拍 / 网格三种，也能用自己的图 |
+| 背景 | 人像抠像后把背景做景深虚化（首选），或整个换掉 |
 | 字幕 | 重做大字号描边字幕，关键词高亮，自动避开平台底部 UI |
 | 画质 | 压缩噪点抑制 → Lanczos 放大 → 锐化 → 调色 |
 | 声音 | 高通、降噪、去浑浊、提人声、压缩、统一到 -14 LUFS |
@@ -173,20 +173,28 @@ hhea 度量缩放，同一个数字在 PingFang SC、微软雅黑、Noto Sans SC
 
 想手动锁死字号就传 `--size 96`，或加 `--no-autofit`。
 
-## 换背景
+## 背景处理
 
-拍摄环境不好看时可以整个换掉：
+拍摄环境不好看时，**先试景深虚化，别急着换背景**：
 
 ```bash
 pip install mediapipe            # 只有这个功能需要
-python3 $VP/vp_backdrop.py --style bookshelf --size 1080x1920 --out backdrop.png
-python3 $VP/vp_bg.py 原片.mp4 --bg backdrop.png --out 换背景.mp4 --bg-blur 2
+python3 $VP/vp_bg.py 原片.mp4 --blur 30 --sharpen 0.6 --out 虚化.mp4
 ```
 
-三种自带背景：`bookshelf`（塞满书的书架）、`studio`（深色棚拍）、`grid`（深色网格）。
-`--bg` 也接受任何自己的图片——实拍照片或 AI 生成的都行。
+背景是真实房间、真实光线，只是失焦，没有任何合成痕迹；主体再锐一点，
+浅景深的对比就出来了，观感接近正经机器拍的。
 
-选背景时让**光比接近原素材**：明亮房间拍的人配亮背景，边缘才不明显。
+合成背景很难不假——光比、透视、噪点、色温任一项对不上，边缘立刻露馅。
+只有原背景实在没法看才换：
+
+```bash
+python3 $VP/vp_backdrop.py --style bookshelf --size 1080x1920 --out backdrop.png
+python3 $VP/vp_bg.py 原片.mp4 --bg backdrop.png --out 换背景.mp4
+```
+
+自带的 `bookshelf` / `studio` / `grid` 是矢量排版，**不是照片**。要照片级效果，
+用即梦或 Midjourney 生成一张再喂给 `--bg`，并让它的亮度接近原素材。
 
 ## 配图卡
 

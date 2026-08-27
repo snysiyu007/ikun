@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""把口播视频的背景整个换掉：抠出人像，合成到一张新背景上。
+"""处理口播视频的背景：抠出人像，把背景虚化，或者整个换掉。
 
 用法:
-    python3 vp_bg.py 原片.mp4 --bg 背景.png --out 换背景.mp4
+    python3 vp_bg.py 原片.mp4 --blur 26 --out 虚化.mp4      # 景深虚化（推荐）
+    python3 vp_bg.py 原片.mp4 --bg 背景.png --out 换背景.mp4  # 整个换掉
+
+**优先用 --blur**。背景是真实房间、真实光线，只是失焦，看不出后期痕迹；
+换成一张合成图，只要光比、透视、颗粒对不上，一眼就假。除非原背景实在没法看，
+否则不要换。
 
 依赖 ffmpeg + mediapipe（只有这个功能需要 mediapipe，其余脚本不需要）:
     pip install mediapipe
@@ -72,10 +77,32 @@ def box_blur(a, r):
     return (ii[y1, x1] - ii[y0, x1] - ii[y1, x0] + ii[y0, x0]) / (k * k)
 
 
+def big_blur(a, r, ds=4):
+    """大半径模糊降到 1/ds 分辨率上做——反正结果是糊的，看不出差别，但快十几倍。"""
+    import numpy as np
+    from PIL import Image
+    if r < ds * 2:
+        return box_blur(a, r)
+    H, W = a.shape
+    sw, sh = max(2, W // ds), max(2, H // ds)
+    small = np.asarray(Image.fromarray(a).resize((sw, sh), Image.BILINEAR))
+    small = box_blur(small, max(1, r // ds))
+    small = box_blur(small, max(1, r // (ds * 2)))      # 叠两次，接近高斯
+    return np.asarray(Image.fromarray(small).resize((W, H), Image.BILINEAR))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("video")
-    ap.add_argument("--bg", required=True, help="背景图片")
+    ap.add_argument("--bg", default=None, help="换成这张背景图")
+    ap.add_argument("--blur", type=int, default=0,
+                    help="景深虚化半径（像素）。720 宽的素材 22~30 比较自然")
+    ap.add_argument("--dim", type=float, default=0.12,
+                    help="背景压暗比例，让主体更突出（0~0.4）")
+    ap.add_argument("--desat", type=float, default=0.18,
+                    help="背景降饱和比例（0~0.5）")
+    ap.add_argument("--sharpen", type=float, default=0.55,
+                    help="主体锐化强度，源片偏软时有用（0~1.2，超过 1.2 会有毛边）")
     ap.add_argument("--out", default="bg_replaced.mp4")
     ap.add_argument("--model", default=None)
     ap.add_argument("--feather", type=int, default=3, help="边缘羽化半径，像素")
@@ -96,11 +123,16 @@ def main():
     except ImportError:
         sys.exit("需要 mediapipe：pip install mediapipe")
 
+    if not args.bg and not args.blur:
+        sys.exit("要么 --blur 半径（虚化真实背景，推荐），要么 --bg 图片（整个换掉）")
+
     W, H, fps = probe(args.video)
-    bg = load_bg(args.bg, W, H)
-    if args.bg_blur:
-        for c in range(3):
-            bg[..., c] = box_blur(bg[..., c], args.bg_blur)
+    bg = None
+    if args.bg:
+        bg = load_bg(args.bg, W, H)
+        if args.bg_blur:
+            for c in range(3):
+                bg[..., c] = box_blur(bg[..., c], args.bg_blur)
 
     seg = vision.ImageSegmenter.create_from_options(vision.ImageSegmenterOptions(
         base_options=mpp.BaseOptions(model_asset_path=ensure_model(args.model)),
@@ -137,8 +169,26 @@ def main():
             prev = m
 
             a = m[..., None]
-            out = frame.astype(np.float32) * a + bg * (1 - a)
-            enc.stdin.write(out.astype(np.uint8).tobytes())
+            f = frame.astype(np.float32)
+            if args.sharpen > 0:
+                # 主体锐化：背景已经糊了，人再锐一点，"浅景深"的感觉才立得住
+                soft = np.stack([box_blur(f[..., c], 2) for c in range(3)], axis=-1)
+                f = np.clip(f + args.sharpen * (f - soft), 0, 255)
+            if bg is not None:
+                back = bg
+            else:
+                # 归一化卷积：只用背景像素做模糊，否则人物颜色会向外糊出一圈光晕
+                bgm = 1.0 - m
+                den = big_blur(bgm, args.blur) + 1e-4
+                back = np.stack([big_blur(f[..., c] * bgm, args.blur) / den
+                                 for c in range(3)], axis=-1)
+                if args.desat:
+                    g = back.mean(axis=2, keepdims=True)
+                    back = back * (1 - args.desat) + g * args.desat
+                if args.dim:
+                    back *= (1 - args.dim)
+            out = f * a + back * (1 - a)
+            enc.stdin.write(np.clip(out, 0, 255).astype(np.uint8).tobytes())
             n += 1
             if n % 60 == 0:
                 print(f"\r  已处理 {n} 帧", end="", flush=True)
