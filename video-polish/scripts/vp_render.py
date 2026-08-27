@@ -10,6 +10,7 @@ plan.json 结构见 SKILL.md。全部依赖只有 ffmpeg。
 import argparse
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -21,6 +22,47 @@ DEF_LOOK = {"denoise": "2:1:3:3", "sharpen": 0.55, "brightness": 0.025,
 DEF_AUDIO = {"highpass": 85, "denoise": True, "denoise_amount": 10,
              "presence": 3.0, "mud_cut": -2.0, "compress": True,
              "lufs": -14.0, "true_peak": -1.5, "fade_ms": 15}
+
+
+def source_time(segs, t_out):
+    """把成片时间换算回原片时间。"""
+    acc = 0.0
+    for s in segs:
+        if t_out < acc + s["duration"]:
+            return s["start"] + (t_out - acc)
+        acc += s["duration"]
+    return segs[-1]["end"] - 1e-3
+
+
+def title_only_ass(ass_path, t_out, out_path):
+    """抽出成片 t_out 时刻的标题层，重新计时到 0，供封面单帧使用。
+
+    封面只要标题，不要正文字幕；正文字幕已经烧进成片，所以封面得从原片重渲一帧。
+    """
+    try:
+        raw = open(ass_path, encoding="utf-8").read()
+    except OSError:
+        return None
+    head, events = raw.split("[Events]", 1)
+    fmt, picked = "", None
+    for line in events.splitlines():
+        if line.startswith("Format:"):
+            fmt = line
+        elif line.startswith("Dialogue:"):
+            f = line.split(",", 9)
+            if len(f) < 10 or f[3].strip() not in ("Title", "CTA"):
+                continue
+            def secs(v):
+                h, m, sec = v.strip().split(":")
+                return int(h) * 3600 + int(m) * 60 + float(sec)
+            if secs(f[1]) <= t_out < secs(f[2]):
+                body = re.sub(r"\{\\fad\([^)]*\)\}", "", f[9])
+                picked = ",".join(f[:1] + ["0:00:00.00", "0:00:10.00"] + f[3:9] + [body])
+    if not picked:
+        return None
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write(head + "[Events]\n" + fmt + "\n" + picked + "\n")
+    return out_path
 
 
 def build_video_chain(look, seg_zoom, crop, size):
@@ -91,9 +133,14 @@ def build_filtergraph(plan):
         st, en = float(s["start"]), float(s["end"])
         dur = s["duration"]
         chain = build_video_chain(look, s.get("zoom", 1.0), crop, size)
-        # 画面按帧号选，避免时间戳比较产生 ±1 帧的漂移
-        sel = f"select='between(n\\,{s['frame_in']}\\,{s['frame_out']})'"
-        g.append(f"[v{i}]{sel},setpts=PTS-STARTPTS,{chain}[vv{i}]")
+        # trim 负责让这一路尽早 EOF（否则 concat 会等到整条流读完，
+        # 前面的分支把整段输出堆在缓冲里，片段一多就卡死）；
+        # select 再按秒级时间精确取帧，半帧的判定余量远大于时间戳误差，
+        # 不会像 trim 单独用那样出现 ±1 帧的漂移。
+        lo, hi = (s["frame_in"] - 0.5) / fps, (s["frame_out"] + 0.5) / fps
+        cut = (f"trim=start={max(0.0,(s['frame_in']-1)/fps):.6f}:end={(s['frame_out']+2)/fps:.6f},"
+               f"select='between(t\\,{lo:.6f}\\,{hi:.6f})'")
+        g.append(f"[v{i}]{cut},setpts=PTS-STARTPTS,{chain}[vv{i}]")
         af = (f"atrim=start={st:.6f}:end={en:.6f},asetpts=PTS-STARTPTS,"
               f"afade=t=in:st=0:d={fade},afade=t=out:st={max(0.0,dur-fade):.3f}:d={fade}")
         g.append(f"[a{i}]{af}[aa{i}]")
@@ -164,9 +211,24 @@ def main():
         path = cover.get("path", "cover.jpg")
         if not os.path.isabs(path):
             path = os.path.join(base, path)
-        subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", str(at), "-i", plan["output"],
-                        "-frames:v", "1", "-q:v", "2", path], check=False)
-        print(f"封面 -> {path}")
+        segs = quantize(plan["segments"], plan.get("fps", 30))
+        src_t = source_time(segs, min(at, total - 0.05))
+        chain = build_video_chain({**DEF_LOOK, **plan.get("look", {})},
+                                  1.0, plan["source_crop"], plan.get("size", [1080, 1920]))
+        tmp_ass = os.path.join(base, ".vp_cover.ass")
+        if plan.get("subtitles") and title_only_ass(plan["subtitles"], at, tmp_ass):
+            chain += f",subtitles='{esc_path(tmp_ass)}'"
+        r = subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", f"{src_t:.3f}",
+                            "-i", plan["input"], "-vf", chain,
+                            "-frames:v", "1", "-q:v", "2", path], check=False)
+        if os.path.exists(tmp_ass):
+            os.remove(tmp_ass)
+        if r.returncode == 0:
+            print(f"封面（只带标题）-> {path}")
+        else:
+            subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", str(at), "-i", plan["output"],
+                            "-frames:v", "1", "-q:v", "2", path], check=False)
+            print(f"封面 -> {path}")
 
     out = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                           "format=duration,size", "-of", "default=nw=1", plan["output"]],
