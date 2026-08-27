@@ -14,6 +14,7 @@
 | 节奏 | 自动剔除段内停顿，通常压掉 10%~15% 时长 |
 | 镜头 | 逐段轮换变焦，单机位口播也有"多机位"感 |
 | 配图 | 把关键概念做成整屏图卡切进去，矢量图标 + 无头浏览器排版，零素材 |
+| 换背景 | 抠出人像换掉整个背景，自带书架 / 棚拍 / 网格三种，也能用自己的图 |
 | 字幕 | 重做大字号描边字幕，关键词高亮，自动避开平台底部 UI |
 | 画质 | 压缩噪点抑制 → Lanczos 放大 → 锐化 → 调色 |
 | 声音 | 高通、降噪、去浑浊、提人声、压缩、统一到 -14 LUFS |
@@ -95,6 +96,8 @@ python3 $VP/vp_render.py plan.json
 | `scripts/vp_read_subs.py` | 把原片烧录字幕切成带序号拼图；`--merge` 再把读出的文案贴回时间轴 |
 | `scripts/vp_plan.py` | 选段 → 剔停顿 → 分配变焦 → 生成 plan.json |
 | `scripts/vp_cards.py` | 概念描述 → 整屏配图卡 PNG（无头浏览器排版） |
+| `scripts/vp_backdrop.py` | 生成换背景用的背景图（书架 / 棚拍 / 网格） |
+| `scripts/vp_bg.py` | 人像抠像 + 背景替换 |
 | `scripts/vp_icons.py` | 配图卡用的矢量图标库 |
 | `scripts/vp_ass.py` | 文案时间轴 → 竖屏风格 ASS 字幕，自动重新对时 |
 | `scripts/vp_render.py` | 按 plan.json 渲染成片和封面 |
@@ -170,6 +173,21 @@ hhea 度量缩放，同一个数字在 PingFang SC、微软雅黑、Noto Sans SC
 
 想手动锁死字号就传 `--size 96`，或加 `--no-autofit`。
 
+## 换背景
+
+拍摄环境不好看时可以整个换掉：
+
+```bash
+pip install mediapipe            # 只有这个功能需要
+python3 $VP/vp_backdrop.py --style bookshelf --size 1080x1920 --out backdrop.png
+python3 $VP/vp_bg.py 原片.mp4 --bg backdrop.png --out 换背景.mp4 --bg-blur 2
+```
+
+三种自带背景：`bookshelf`（塞满书的书架）、`studio`（深色棚拍）、`grid`（深色网格）。
+`--bg` 也接受任何自己的图片——实拍照片或 AI 生成的都行。
+
+选背景时让**光比接近原素材**：明亮房间拍的人配亮背景，边缘才不明显。
+
 ## 配图卡
 
 口播视频最劝退的地方是全程一张脸。`vp_cards.py` 把关键概念渲染成整屏图卡，
@@ -193,7 +211,8 @@ hhea 度量缩放，同一个数字在 PingFang SC、微软雅黑、Noto Sans SC
 - 不做语音识别。文案来源是现成 srt、本地 `faster-whisper`，或读图抄烧录字幕。
 - 不加背景音乐。BGM 建议发布时用平台自带曲库，避免版权风险。
 - 不生成写实图片/AI 绘图。配图卡是排版和矢量图标，要照片级素材得自己用即梦、
-  Midjourney 之类生成好再放进 `inserts`。
+  Midjourney 之类生成好再放进 `inserts` 或 `vp_bg.py --bg`。
+- 不做换脸、改体型、往手里加物体这类生成式修改。换背景是抠像替换，不是重绘画面。
 - 变焦是逐段静态的，不做人脸跟踪推拉。
 - 输出固定 H.264 + AAC + faststart，不支持 HDR 或竖屏以外的比例预设。
 

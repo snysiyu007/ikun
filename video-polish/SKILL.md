@@ -179,6 +179,36 @@ python3 $VP/vp_cards.py cards.json --out cards
 用户自己有素材（产品截图、AI 生成图、录屏截帧）时，直接把图片路径写进 `inserts`
 就行，和配图卡走同一条通道，会等比裁切到画幅、不变形。
 
+## Step 4.5: 换背景（可选）
+
+拍摄环境不好看时，把背景整个换掉。抠像用 MediaPipe 的人像分割，只有这个功能需要
+额外装 `pip install mediapipe`，模型 250KB 会自动缓存到 `~/.cache/video-polish/`。
+
+```bash
+python3 $VP/vp_backdrop.py --style bookshelf --size 720x1280 --out backdrop.png
+python3 $VP/vp_bg.py 原片.mp4 --bg backdrop.png --out 换背景.mp4 --bg-blur 2
+```
+
+背景风格：`bookshelf`（塞满书的书架）、`studio`（深色棚拍渐变）、`grid`（深色细网格）。
+也可以直接 `--bg 自己的图.jpg`，用实拍照片或 AI 生成的图，会等比裁切到画幅。
+
+**选背景的关键是光比要接近**。被摄者是亮的、背景是暗的，边缘一眼就看出是抠出来的；
+所以明亮房间拍的素材配 `bookshelf` 比配 `studio` 自然得多。
+
+调参：
+
+| 参数 | 默认 | 作用 |
+|------|------|------|
+| `--erode` | 0.06 | 向内收边，去掉原背景残留的亮边。有白边就加大 |
+| `--feather` | 3 | 边缘羽化半径，太小像剪纸，太大人会发虚 |
+| `--smooth` | 0.55 | 掩码时间平滑。边缘抖就加大，动作拖影就减小 |
+| `--bg-blur` | 0 | 背景额外模糊，做浅景深，让主体更突出 |
+
+处理速度约 14 帧/秒（4 核 CPU），21 秒的素材要 45 秒左右。
+
+**做不到的事**，别硬试：换脸、改变体型、往手里加物体、凭空加一台电脑——这些要生成模型，
+这套流程里没有。需要的话让用户直接实拍摆进画面，或用即梦 / 可灵这类工具单独做。
+
 ## Step 5: 加标题和片尾引导
 
 编辑 `plan.json` 的 `overlays`：
@@ -261,6 +291,9 @@ ffmpeg -hide_banner -nostats -i 成片.mp4 -af ebur128=peak=true -f null - 2>&1 
 - **配图卡渲染报"找不到 Chrome"**：装 Chrome / Chromium / Edge 任意一个，
   或 `vp_cards.py --browser /path/to/chrome` 指定。没有浏览器时跳过配图，其余流程照常。
 - **配图卡里的中文变方框**：`cards.json` 的 `font` 写的字体没装，换成系统里有的。
+- **换背景边缘有白边**：加大 `--erode`（0.10~0.15）。
+- **换背景边缘一闪一闪**：加大 `--smooth`（0.7~0.8）。
+- **`vp_bg.py` 报缺 libEGL / libGLESv2**（Linux）：`apt install libegl1 libgles2`。
 
 ## 交付时告诉用户
 
