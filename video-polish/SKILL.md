@@ -107,7 +107,79 @@ python3 $VP/vp_plan.py --analysis analysis.json --trim-silence \
   放大三倍只会更糊，输出 `720x1280` 往往更实在，同样文件大小下画面更干净。
   字号会按输出分辨率自动重算，不用手动改。
 
-## Step 4: 加标题和片尾引导
+## Step 4: 配图卡（让画面不只有一张脸）
+
+口播视频最容易劝退的地方就是全程一张脸。配图卡把关键概念做成整屏图卡切进去，
+零素材——图标是矢量画的，排版用无头 Chrome 渲染。
+
+写 `cards.json`，一张卡对应一个要讲清楚的概念：
+
+```json
+{"size": [1080,1920], "font": "PingFang SC", "accent": "#FFD400",
+ "cards": [
+  {"id":"steam","type":"statement","icon":"steam","kicker":"第一次工业革命",
+   "title":"蒸汽机<em>本身</em><br>不提升生产力","sub":"它只是被发明出来了而已"},
+  {"id":"roles","type":"versus","title":"岗位没消失，只是换了工具",
+   "left":{"icon":"carriage","label":"马夫","note":"从前"},
+   "right":{"icon":"car","label":"司机","note":"现在"}}
+]}
+```
+
+```bash
+python3 $VP/vp_cards.py cards.json --out cards
+```
+
+卡片类型：
+
+| type | 用来讲 | 关键字段 |
+|------|--------|---------|
+| `statement` | 一个观点、一句金句 | `icon` `title` `sub` `kicker` |
+| `versus` | 两个东西的对比 | `left` `right` `divider` `sub` |
+| `flow` | 一件事分几步发生 | `steps[]` |
+| `stat` | 一个数字撑起来的结论 | `value` `unit` `title` `sub` |
+| `chips` | 一排并列的东西（工具、平台） | `chips[]` |
+
+图标名见 `vp_icons.py`：`gear` `steam` `carriage` `car` `filter` `person` `people`
+`bolt` `fog` `up` `question` `clock` `fork`。`title` 里可以用 `<em>` 高亮、`<br>` 换行。
+
+然后在 `plan.json` 里排时间：
+
+```json
+"inserts": [
+ {"image":"cards/steam.png","start":6.8,"end":9.9,"motion":"up"},
+ {"image":"cards/roles.png","start":21.4,"end":24.7,"motion":"down"}
+]
+```
+
+**排时间的规矩**（这一步决定配图是加分还是出戏）：
+
+- 卡片必须压在**对应那句话**上。排完用下面这段核对每张卡覆盖了哪几句字幕，
+  对不上就挪，别靠感觉：
+  ```bash
+  python3 - <<'EOF'
+  import re
+  def s2f(v):
+      h,m,s = v.split(":"); return int(h)*3600+int(m)*60+float(s)
+  cues = []
+  for ln in open("成片.ass", encoding="utf-8"):
+      if ln.startswith("Dialogue:"):
+          f = ln.split(",", 9)
+          if f[3].strip() == "Sub":
+              cues.append((s2f(f[1]), s2f(f[2]),
+                           re.sub(r"\{[^}]*\}", "", f[9]).replace("\N", "").strip()))
+  for a, b in [(6.8, 9.9), (21.4, 24.7)]:          # 换成你的 inserts 时间
+      print(a, b, " / ".join(t for s, e, t in cues if e > a and s < b))
+  EOF
+  ```
+- 单张 2.5~4 秒。短于 2 秒来不及看，长于 4 秒观众会想看人。
+- 总占比控制在 25%~35%。低于 20% 起不到作用，高于 40% 就不像口播了。
+- `motion` 逐张 `up` / `down` 交替，避免每张卡的位移方向都一样。
+- 卡片烧在**字幕下层**，所以切到配图时字幕照常可读，卡片版式也已经给底部字幕留了位置。
+
+用户自己有素材（产品截图、AI 生成图、录屏截帧）时，直接把图片路径写进 `inserts`
+就行，和配图卡走同一条通道，会等比裁切到画幅、不变形。
+
+## Step 5: 加标题和片尾引导
 
 编辑 `plan.json` 的 `overlays`：
 
@@ -120,7 +192,7 @@ python3 $VP/vp_plan.py --analysis analysis.json --trim-silence \
 
 标题要给出**信息增量**，不要和第一句字幕重复。`\n` 换行，`【】`高亮。
 
-## Step 5: 生成字幕
+## Step 6: 生成字幕
 
 ```bash
 python3 $VP/vp_ass.py plan.json --segments segments.json --out 成片.ass
@@ -140,7 +212,7 @@ python3 $VP/vp_ass.py plan.json --segments segments.json --out 成片.ass
 
 `margin_v` 默认是画面高度的 22.5%，用来避开抖音底部的按钮和文案区。
 
-## Step 6: 渲染
+## Step 7: 渲染
 
 ```bash
 python3 $VP/vp_render.py plan.json --preview 12   # 先看前 12 秒
@@ -186,6 +258,9 @@ ffmpeg -hide_banner -nostats -i 成片.mp4 -af ebur128=peak=true -f null - 2>&1 
 - **切点有爆音**：调大 `audio.fade_ms`（默认 15，可以到 25）。
 - **画面糊**：源码率太低，降低 `--headroom-trim` 少裁一点，或直接输出 720x1280。
 - **找不到烧录字幕带**：`--no-scan` 跳过扫描，用 `--crop` 手动给裁切框。
+- **配图卡渲染报"找不到 Chrome"**：装 Chrome / Chromium / Edge 任意一个，
+  或 `vp_cards.py --browser /path/to/chrome` 指定。没有浏览器时跳过配图，其余流程照常。
+- **配图卡里的中文变方框**：`cards.json` 的 `font` 写的字体没装，换成系统里有的。
 
 ## 交付时告诉用户
 

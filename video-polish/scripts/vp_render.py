@@ -114,6 +114,49 @@ def build_audio_chain(a):
     return ",".join(parts)
 
 
+def insert_branches(plan, size, fps, first_input=1):
+    """把配图卡做成叠在成片上的分支，返回 (滤镜片段, 额外输入参数, 叠加指令)。
+
+    卡片放在字幕【下面】，这样切到配图时字幕仍然可读。
+    """
+    W, H = size
+    fil, inputs, overlays = [], [], []
+    for k, ins in enumerate(plan.get("inserts", [])):
+        path = ins["image"]
+        if not os.path.isabs(path):
+            path = os.path.join(plan["_base"], path)
+        if not os.path.exists(path):
+            sys.exit(f"配图卡不存在：{path}")
+        a, b = float(ins["start"]), float(ins["end"])
+        dur = max(0.2, b - a)
+        fade = min(float(ins.get("fade", 0.14)), dur / 3)
+        idx = first_input + k
+        inputs += ["-loop", "1", "-t", f"{dur:.3f}", "-i", path]
+
+        chain = ["format=rgba"]
+        if ins.get("mode", "cutaway") == "banner":
+            chain.append(f"scale={W}:-1")
+            x, y = 0, int(ins.get("y", H * 0.06))
+        else:
+            # 竖向缓慢位移：静止的整屏卡片在快节奏里会显得发闷
+            m = ins.get("motion", "up")
+            over = int(H * 0.04) // 2 * 2
+            # 等比放大再裁切：直接拉伸会让卡片（或用户自己的图）变形
+            chain.append(f"scale={W}:{H + over}:force_original_aspect_ratio=increase")
+            if m == "none":
+                chain.append(f"crop={W}:{H}:(iw-ow)/2:(ih-oh)/2")
+            else:
+                prog = f"t/{dur:.3f}" if m == "up" else f"(1-t/{dur:.3f})"
+                chain.append(f"crop={W}:{H}:(iw-ow)/2:'(ih-oh)*(1-{prog})'")
+            x, y = 0, 0
+        chain.append(f"fade=t=in:st=0:d={fade:.3f}:alpha=1")
+        chain.append(f"fade=t=out:st={dur - fade:.3f}:d={fade:.3f}:alpha=1")
+        chain.append(f"setpts=PTS+{a:.3f}/TB")
+        fil.append(f"[{idx}:v]{','.join(chain)}[ins{k}]")
+        overlays.append((f"ins{k}", x, y, a, b))
+    return fil, inputs, overlays
+
+
 def build_filtergraph(plan):
     size = plan.get("size", [1080, 1920])
     fps = plan.get("fps", 30)
@@ -149,6 +192,14 @@ def build_filtergraph(plan):
              + f"concat=n={len(segs)}:v=1:a=1[vc][aout]")
 
     vlast = "vc"
+    ins_fil, ins_inputs, ins_overlays = insert_branches(plan, size, fps)
+    g.extend(ins_fil)
+    for j, (lbl, x, y, a, b) in enumerate(ins_overlays):
+        g.append(f"[{vlast}][{lbl}]overlay={x}:{y}:eof_action=pass:repeatlast=0"
+                 f":enable='between(t,{a:.3f},{b:.3f})'[ov{j}]")
+        vlast = f"ov{j}"
+    plan["_insert_inputs"] = ins_inputs
+
     subs = plan.get("subtitles")
     if subs:
         fdir = plan.get("fonts_dir")
@@ -182,17 +233,19 @@ def main():
 
     total = sum(s["duration"] for s in quantize(plan["segments"], plan.get("fps", 30)))
     plan["_total"] = total
+    plan["_base"] = base
     fg = build_filtergraph(plan)
 
     crf = args.crf if args.crf is not None else plan.get("crf", 18)
-    cmd = ["ffmpeg", "-y", "-hide_banner", "-i", plan["input"],
-           "-filter_complex", fg, "-map", "[vout]", "-map", "[aout]",
+    cmd = (["ffmpeg", "-y", "-hide_banner", "-i", plan["input"]]
+           + plan.get("_insert_inputs", [])
+           + ["-filter_complex", fg, "-map", "[vout]", "-map", "[aout]",
            "-c:v", "libx264", "-preset", plan.get("preset", "slow"), "-crf", str(crf),
            "-profile:v", "high", "-level", "4.1", "-pix_fmt", "yuv420p",
            "-x264-params", "keyint=60:min-keyint=30:scenecut=0",
            "-c:a", "aac", "-ar", "48000", "-ac", "2",
            "-b:a", str({**DEF_AUDIO, **plan.get("audio", {})}["bitrate"]),
-           "-movflags", "+faststart"]
+           "-movflags", "+faststart"])
     if args.preview:
         cmd += ["-t", str(args.preview)]
     cmd.append(plan["output"])
@@ -201,7 +254,10 @@ def main():
         print(" ".join(shlex.quote(c) for c in cmd))
         return
 
-    print(f"片段 {len(plan['segments'])} 个，成片 {total:.2f} 秒 → {plan['output']}")
+    n_ins = len(plan.get("inserts", []))
+    ins_t = sum(float(i["end"]) - float(i["start"]) for i in plan.get("inserts", []))
+    print(f"片段 {len(plan['segments'])} 个，配图卡 {n_ins} 张（占 {ins_t:.1f}s / {100*ins_t/total:.0f}%），"
+          f"成片 {total:.2f} 秒 → {plan['output']}")
     r = subprocess.run(cmd)
     if r.returncode != 0:
         sys.exit(r.returncode)
