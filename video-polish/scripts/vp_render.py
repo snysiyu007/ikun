@@ -14,6 +14,8 @@ import shlex
 import subprocess
 import sys
 
+from vp_common import quantize
+
 DEF_LOOK = {"denoise": "2:1:3:3", "sharpen": 0.55, "brightness": 0.025,
             "contrast": 1.10, "saturation": 1.10, "gamma": 1.0, "skin_smooth": 0.0}
 DEF_AUDIO = {"highpass": 85, "denoise": True, "denoise_amount": 10,
@@ -81,7 +83,7 @@ def build_filtergraph(plan):
     crop = plan["source_crop"]
     look = {**DEF_LOOK, **plan.get("look", {})}
     aud = {**DEF_AUDIO, **plan.get("audio", {})}
-    segs = plan["segments"]
+    segs = quantize(plan["segments"], fps)
     fade = aud.get("fade_ms", 15) / 1000.0
 
     g = []
@@ -92,10 +94,12 @@ def build_filtergraph(plan):
 
     for i, s in enumerate(segs):
         st, en = float(s["start"]), float(s["end"])
-        dur = en - st
+        dur = s["duration"]
         chain = build_video_chain(look, s.get("zoom", 1.0), crop, size)
-        g.append(f"[v{i}]trim=start={st}:end={en},setpts=PTS-STARTPTS,{chain}[vv{i}]")
-        af = (f"atrim=start={st}:end={en},asetpts=PTS-STARTPTS,"
+        # 画面按帧号选，避免时间戳比较产生 ±1 帧的漂移
+        sel = f"select='between(n\\,{s['frame_in']}\\,{s['frame_out']})'"
+        g.append(f"[v{i}]{sel},setpts=PTS-STARTPTS,{chain}[vv{i}]")
+        af = (f"atrim=start={st:.6f}:end={en:.6f},asetpts=PTS-STARTPTS,"
               f"afade=t=in:st=0:d={fade},afade=t=out:st={max(0.0,dur-fade):.3f}:d={fade}")
         g.append(f"[a{i}]{af}[aa{i}]")
 
@@ -134,7 +138,7 @@ def main():
         if plan.get(k) and not os.path.isabs(plan[k]):
             plan[k] = os.path.join(base, plan[k])
 
-    total = sum(float(s["end"]) - float(s["start"]) for s in plan["segments"])
+    total = sum(s["duration"] for s in quantize(plan["segments"], plan.get("fps", 30)))
     plan["_total"] = total
     fg = build_filtergraph(plan)
 

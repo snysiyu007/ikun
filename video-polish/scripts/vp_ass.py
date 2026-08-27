@@ -18,6 +18,8 @@ import subprocess
 import sys
 import tempfile
 
+from vp_common import timeline
+
 CJK_PUNCT = "，。？！；：、,.?!;:…—"
 NO_BREAK_BEFORE = "，。？！；：、,.?!;:）】》」』…"
 NO_BREAK_AFTER = "（【《「『("
@@ -213,16 +215,6 @@ def wrap_marked(text, max_units, max_lines, accent):
     return out
 
 
-def build_keep_map(keeps):
-    """返回 (原片区间, 输出起点) 列表。"""
-    out, acc = [], 0.0
-    for k in keeps:
-        s, e = float(k[0]), float(k[1])
-        out.append((s, e, acc))
-        acc += e - s
-    return out, acc
-
-
 def remap(segments, keepmap, min_dur):
     cues = []
     for seg in segments:
@@ -322,8 +314,7 @@ def main():
         else:
             tsize = int(size * 1.26)
 
-    keeps = [[s["start"], s["end"]] for s in plan["segments"]]
-    keepmap, total = build_keep_map(keeps)
+    keepmap, total = timeline(plan["segments"], plan.get("fps", 30))
     cues = remap(segs, keepmap, plan.get("min_cue", 0.18))
 
     head = HEADER.format(
