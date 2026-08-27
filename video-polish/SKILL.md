@@ -171,6 +171,7 @@ ffmpeg -hide_banner -nostats -i 成片.mp4 -af ebur128=peak=true -f null - 2>&1 
 | `audio.denoise` | true | 环境很安静可关掉，避免人声发闷 |
 | `audio.lufs` | -14 | 抖音/视频号/小红书都用 -14；B 站可用 -16 |
 | `audio.presence` | 3.0 | 声音发闷加到 5；齿音重降到 1 |
+| `crf` | 20 | 要更小的文件调到 23（几乎看不出差别）；源片码率本来就低时，低于 18 是浪费 |
 
 ## 异常处理
 

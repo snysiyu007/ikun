@@ -109,7 +109,7 @@ def main():
         "subtitles": args.subtitles,
         "overlays": [],
         "cover": {"at": 0.8, "path": "cover.jpg"},
-        "crf": 18,
+        "crf": 20,
     }
     if args.fonts_dir:
         plan["fonts_dir"] = args.fonts_dir
