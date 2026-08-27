@@ -6,7 +6,11 @@
 
 产出:
     subsheets/runs.json   每条字幕的序号与起止时间（原片时间轴）
-    subsheets/s00.jpg …   带序号的字幕拼图，逐张读图把文字抄进 segments.json
+    subsheets/s00.jpg …   带序号的字幕拼图
+
+读完图后，把文字按序号一行一条写进 texts.txt，再合并成 segments.json：
+
+    python3 vp_read_subs.py --merge subsheets/runs.json texts.txt --out segments.json
 
 只依赖 ffmpeg 和 Python 标准库。
 """
@@ -87,9 +91,28 @@ def detect_runs(path, crop, fps, gw=136, gh=32, bright=200, change=14, min_pix=1
     return out
 
 
+def merge(runs_path, texts_path, out_path):
+    """把读出来的文案按序号贴回时间轴。texts.txt 每行一条，空行表示这条不要字幕。"""
+    runs = json.load(open(runs_path, encoding="utf-8"))
+    lines = open(texts_path, encoding="utf-8").read().splitlines()
+    if len(lines) != len(runs):
+        print(f"警告：文案 {len(lines)} 行，字幕 {len(runs)} 条，数量对不上。"
+              f"按较短的一边对齐，请核对序号。", file=sys.stderr)
+    segs = []
+    for r, t in zip(runs, lines):
+        t = t.strip()
+        if t:
+            segs.append({"start": r["start"], "end": r["end"], "text": t})
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(segs, f, ensure_ascii=False, indent=1)
+    print(f"合并 {len(segs)} 条 -> {out_path}")
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("video")
+    ap.add_argument("video", nargs="?")
+    ap.add_argument("--merge", nargs=2, metavar=("RUNS_JSON", "TEXTS_TXT"),
+                    help="把 runs.json 和逐行文案合并成 segments.json")
     ap.add_argument("--analysis", default="analysis.json")
     ap.add_argument("--band", default=None, help="字幕带 顶,底（像素或 0~1 比例）")
     ap.add_argument("--out", default="subsheets")
@@ -97,6 +120,13 @@ def main():
     ap.add_argument("--per-sheet", type=int, default=10)
     ap.add_argument("--sheet-width", type=int, default=880)
     args = ap.parse_args()
+
+    if args.merge:
+        out = args.out if args.out != "subsheets" else "segments.json"
+        return merge(args.merge[0], args.merge[1], out)
+    if not args.video:
+        sys.exit("用法：vp_read_subs.py 原片.mp4 --analysis analysis.json  "
+                 "或  vp_read_subs.py --merge runs.json texts.txt --out segments.json")
 
     W, H, dur = probe(args.video)
     top, bh = band_from(args, H)

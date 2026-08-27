@@ -62,8 +62,9 @@ VP=~/.claude/skills/video-polish/scripts
 python3 $VP/vp_analyze.py 原片.mp4 --json analysis.json --headroom-trim 0.04
 
 # 2. 准备 segments.json（文案时间轴）
-#    原片已烧字幕的话，先切成拼图再照着抄：
+#    原片已烧字幕的话，先切成拼图再照着抄，然后按序号合并：
 python3 $VP/vp_read_subs.py 原片.mp4 --analysis analysis.json --out subsheets
+python3 $VP/vp_read_subs.py --merge subsheets/runs.json texts.txt --out segments.json
 
 # 3. 选段 + 剔停顿 + 分配变焦
 python3 $VP/vp_plan.py --analysis analysis.json --trim-silence \
@@ -84,7 +85,7 @@ python3 $VP/vp_render.py plan.json
 |------|------|
 | `SKILL.md` | Skill 定义，给 Claude Code 看的完整流程和判断标准 |
 | `scripts/vp_analyze.py` | 体检：探测参数、静音、烧录字幕带、主体位置、裁切建议 |
-| `scripts/vp_read_subs.py` | 把原片烧录字幕切成带序号拼图，供读图抄文案 |
+| `scripts/vp_read_subs.py` | 把原片烧录字幕切成带序号拼图；`--merge` 再把读出的文案贴回时间轴 |
 | `scripts/vp_plan.py` | 选段 → 剔停顿 → 分配变焦 → 生成 plan.json |
 | `scripts/vp_ass.py` | 文案时间轴 → 竖屏风格 ASS 字幕，自动重新对时 |
 | `scripts/vp_render.py` | 按 plan.json 渲染成片和封面 |

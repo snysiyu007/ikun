@@ -67,7 +67,11 @@ python3 $VP/vp_analyze.py 原片.mp4 --json analysis.json --headroom-trim 0.04
    python3 $VP/vp_read_subs.py 原片.mp4 --analysis analysis.json --out subsheets
    ```
    生成 `subsheets/s00.jpg …` 和 `subsheets/runs.json`（每条字幕的起止时间）。
-   逐张读图，把文字按序号写回 `segments.json`。
+   逐张读图，把文字**按序号一行一条**写进 `texts.txt`（读不到内容的那条留空行），再合并：
+   ```bash
+   python3 $VP/vp_read_subs.py --merge subsheets/runs.json texts.txt --out segments.json
+   ```
+   行数必须和 `runs.json` 条数一致，否则脚本会告警并按较短一边对齐。
 
 **读文案时顺手做三件事**：
 - 记下口误、重复、跑题的时间段，Step 3 要剪掉；
