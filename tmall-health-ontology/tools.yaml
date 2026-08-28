@@ -1,0 +1,176 @@
+# =====================================================================
+# tools.yaml — 工具/Skill 注册表（对标 Palantir 的 Action/Function 层）
+# 天猫国际·保健行业试点
+#
+# 规则：
+# 1. description 是写给 agent 看的——什么时候该用这个工具、什么时候不该用，
+#    比"功能介绍"重要。
+# 2. 输入输出必须是结构化 schema；参数值尽量引用本体 id
+#    （metrics id / dimension id / object_type id），不接受自由文本口径。
+# 3. 每个工具写清限制（行数上限、超时、必须分区裁剪），
+#    agent 超限时应改用聚合查询而不是硬拉明细。
+# =====================================================================
+
+version: 0.1
+updated: <YYYY-MM-DD>
+
+tools:
+
+  # ---------------- 通用取数 ----------------
+  - id: query_metrics
+    name: 指标取数
+    kind: read
+    description: >
+      按指标+维度+过滤条件查询聚合数据。所有"XX是多少/趋势/对比/排名"类问题优先用它。
+      不用于取订单明细（明细走 query_detail，需要权限）。
+    implementation: <对应的 odps 取数 skill 名称>
+    input_schema:
+      metrics:      {type: array<string>, required: true,  desc: metrics.yaml 中的指标 id，如 [pay_gmv, uv]}
+      object_type:  {type: string,        required: true,  desc: ontology.yaml 中的对象 id，如 brand}
+      object_ids:   {type: array<string>, required: false, desc: 对象主键列表；为空 = 该对象类型全量（受 scope 限制）}
+      time_range:   {type: object,        required: true,  desc: "{start: YYYY-MM-DD, end: YYYY-MM-DD} 或 {campaign_phase_id}"}
+      group_by:     {type: array<string>, required: false, desc: dimensions.yaml 中的维度 id}
+      filters:      {type: object,        required: false, desc: "维度过滤，如 {trade_mode: 保税}"}
+      order_by:     {type: string,        required: false}
+      limit:        {type: int,           required: false, default: 100}
+    output_schema:
+      columns: 维度列 + 指标列
+      format: 二维表（JSON rows）
+    constraints:
+      - 返回行数上限 <1000>，超限报错并提示收窄
+      - 查询必须带 ds 分区裁剪；time_range 跨度上限 <370 天>
+      - 超时 <60s>
+    permissions: 试点用户组 <组名>；行业大盘数据全员可见，单店数据仅对应商家运营可见  # TODO
+    examples:
+      - user_says: 上周 Swisse 的支付GMV和转化率
+        call:
+          metrics: [pay_gmv, pay_rate]
+          object_type: brand
+          object_ids: [<Swisse的brand_id>]     # 先经 search_objects 解析
+          time_range: {start: <上周一>, end: <上周日>}
+      - user_says: 益生菌叶子类目按贸易模式拆一下昨天的GMV
+        call:
+          metrics: [pay_gmv]
+          object_type: category
+          object_ids: [<益生菌叶子类目id>]
+          time_range: {start: <昨天>, end: <昨天>}
+          group_by: [trade_mode]
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 对象解析 ----------------
+  - id: search_objects
+    name: 对象搜索
+    kind: read
+    description: >
+      把对话里的名称解析成对象 id（"Swisse"→brand_id，"益生菌"→cate_id）。
+      任何取数前，凡是用户用名称而非 id 指代对象，必须先调它。
+      命中多个候选时把候选列表给用户确认，不要自行挑选。
+    implementation: <搜索 skill / kbase 实体检索>
+    input_schema:
+      object_type: {type: string, required: false, desc: 限定对象类型；不确定时不填，返回跨类型候选}
+      keyword:     {type: string, required: true}
+      limit:       {type: int,    required: false, default: 5}
+    output_schema:
+      candidates: [{object_type, object_id, name, extra}]
+    constraints:
+      - 优先精确匹配 aliases，再模糊匹配
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 对象档案 ----------------
+  - id: get_object_profile
+    name: 对象档案
+    kind: read
+    description: >
+      给定一个对象，返回它的属性 + 核心指标快照 + 一跳关联对象。
+      用于"介绍一下XX / XX 现在什么情况"类开放问题，避免多次零散取数。
+    implementation: <组合调用：宽表读 + query_metrics 预置指标包>
+    input_schema:
+      object_type: {type: string, required: true}
+      object_id:   {type: string, required: true}
+      time_range:  {type: object, required: false, default: 近30天}
+    output_schema:
+      properties: 对象属性
+      metrics_snapshot: [pay_gmv, uv, pay_rate, new_buyer_ratio, refund_rate]   # 每对象类型可配不同指标包
+      linked_objects: 一跳关联（brand→top商品、item→成分/功效 等）
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 图谱遍历 ----------------
+  - id: kbase_traverse
+    name: 知识图谱查询
+    kind: read
+    description: >
+      沿本体链接遍历 kbase：成分→功效→人群、商品→成分 等。
+      用于"含XX成分的商品 / 适合XX人群的功效 / XX成分有什么用"类问题。
+      涉及功效表述时，回答必须遵守 benefit.claim_boundary 的合规边界。
+    implementation: <kbase 查询接口>
+    input_schema:
+      start_object: {type: object, required: true, desc: "{object_type, object_id}"}
+      path:         {type: array<string>, required: true, desc: "link id 序列，如 [ingredient_supports_benefit, benefit_targets_audience]"}
+      filters:      {type: object, required: false}
+    output_schema:
+      paths: 命中的对象链，含 confidence（低置信度需在回答中声明）
+    owner: <kbase 负责人>
+    status: draft
+
+  # ---------------- 归因诊断 ----------------
+  - id: diagnose_metric_change
+    name: 指标波动诊断
+    kind: read
+    description: >
+      对"为什么涨/跌"类问题执行标准诊断流程（sops.md 的 GMV 诊断 SOP）。
+      不要自由发挥拆维度，按 SOP 顺序执行并输出结构化结论。
+    implementation: <编排：多次 query_metrics 按 SOP 执行>
+    input_schema:
+      metric:       {type: string, required: true, desc: metrics id}
+      object_type:  {type: string, required: true}
+      object_id:    {type: string, required: true}
+      current_range: {type: object, required: true}
+      compare_range: {type: object, required: true, desc: 对比周期（环比/同比/大促阶段对齐）}
+    output_schema:
+      conclusion: 主因（结构化：维度+贡献度）
+      evidence: 每步 SOP 的数据
+      suggestions: 建议动作（仅建议，不执行）
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 报告生成 ----------------
+  - id: generate_weekly_report
+    name: 周报生成
+    kind: read
+    description: >
+      按固定模板生成周报（模板见 sops.md）。范围默认 = 请求人负责的类目/商家。
+    implementation: <编排 skill>
+    input_schema:
+      scope:      {type: object, required: true, desc: "{object_type, object_ids}"}
+      week:       {type: string, required: true, desc: YYYY-WW}
+    output_schema:
+      report_md: Markdown 周报
+    owner: <建设者>
+    status: draft
+
+  # ---------------- （预留）写操作 ----------------
+  # 试点期只做只读。未来若加写操作（如推送预警、提交盘货结果），每个写操作必须：
+  # 幂等、有确认步骤（agent 先展示将执行的内容，用户确认后执行）、留审计日志。
+  # - id: push_alert
+  #   kind: write
+  #   ...
+
+# ---------------------------------------------------------------------
+# 空白骨架
+# ---------------------------------------------------------------------
+# - id: <英文小写id>
+#   name: <中文名>
+#   kind: read | write
+#   description: >
+#     <什么时候用 / 什么时候不用>
+#   implementation: <底层 skill / 接口>
+#   input_schema: {}
+#   output_schema: {}
+#   constraints: []
+#   permissions: <谁能调>
+#   examples: []
+#   owner: <负责人>
+#   status: draft

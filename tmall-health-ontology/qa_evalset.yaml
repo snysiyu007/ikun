@@ -1,0 +1,116 @@
+# =====================================================================
+# qa_evalset.yaml — 评测问答集
+# 天猫国际·保健行业试点
+#
+# 用途：本体/口径/工具任何一处修改后，全量跑一遍，防止改一处坏一片。
+# 收集方式：从真实取数工单和群聊里捞原话（保留原始表述，不要润色！
+# 小二怎么说，就怎么记）。每个岗位至少 10 条，v1 目标 30 条起步。
+#
+# persona 取值：行业运营 / 商家运营 / 数据分析 / 主管
+# 每条标注期望行为：该反问的必须反问，该拒绝的必须拒绝（权限）。
+# =====================================================================
+
+version: 0.1
+updated: <YYYY-MM-DD>
+
+cases:
+
+  # ---- 直接取数类 ----
+  - id: q001
+    persona: 行业运营
+    question: 上周保健大盘GMV多少，同比怎么样
+    expected_clarification: null            # 大盘范围和周定义在 conventions 里有默认，无需反问
+    expected_calls:
+      - tool: query_metrics
+        note: metrics=[pay_gmv], object_type=category(试点根类目), time_range=上自然周, 同比取去年同周
+    expected_answer_points:
+      - 给出上周 GMV 绝对值和同比百分比
+      - 注明周口径（自然周）与数据截至日期
+    common_mistakes:
+      - 用"近7天"代替自然周
+      - 同比对齐错位（没有按同口径周对齐）
+
+  - id: q002
+    persona: 商家运营
+    question: Swisse这个月新客占比咋样
+    expected_clarification: 品牌新客还是店铺新客（metrics 里标注了口径歧义）
+    expected_calls:
+      - tool: search_objects
+        note: keyword=Swisse → brand_id
+      - tool: query_metrics
+        note: metrics=[new_buyer_ratio], object_type=brand, time_range=本月至今
+    expected_answer_points:
+      - 澄清口径后给数值
+      - "本月"= 月初至最近有数分区，需注明
+    common_mistakes:
+      - 不澄清直接按某一种新客口径回答
+
+  # ---- 图谱+取数组合类 ----
+  - id: q003
+    persona: 行业运营
+    question: 益生菌里面适合孕妇的商品有哪些卖得好？
+    expected_clarification: null
+    expected_calls:
+      - tool: search_objects
+        note: 益生菌 → cate_id；孕妇 → audience_id
+      - tool: kbase_traverse
+        note: audience(孕妇) 反向找 benefit → ingredient → item，与益生菌类目交集
+      - tool: query_metrics
+        note: 对候选 item 按 pay_gmv 排名
+    expected_answer_points:
+      - 给出 TopN 商品及 GMV
+      - 孕妇人群涉及禁忌，需附 caution_note 合规提示
+      - kbase 低置信度关联要声明"可能"
+    common_mistakes:
+      - 用标题关键词匹配"孕妇"而不走图谱
+      - 输出功效宣称超出 claim_boundary
+
+  # ---- 歧义反问类 ----
+  - id: q004
+    persona: 主管
+    question: 帮我看下销售额
+    expected_clarification: 必须反问——时间范围 + 对象范围（大盘/某品牌/某店？）
+    expected_calls: []
+    expected_answer_points:
+      - 只反问，不猜测取数
+    common_mistakes:
+      - 直接按默认口径给了一个数
+
+  # ---- 诊断类 ----
+  - id: q005
+    persona: 商家运营
+    question: 我负责的XX店铺这周GMV为什么跌了
+    expected_clarification: 确认店铺（若上下文已知负责店铺则免）+ 对比基准（环比上周）
+    expected_calls:
+      - tool: diagnose_metric_change
+        note: metric=pay_gmv, object_type=merchant, 按 sops.md GMV诊断 SOP 执行
+    expected_answer_points:
+      - 结论先行：主因维度 + 贡献度
+      - 附每步证据（大盘对比/渠道拆解/头部商品拆解）
+      - 建议动作单独列出，标明"仅供参考"
+    common_mistakes:
+      - 只报数不归因
+      - 跳过"大盘 vs 自身"这一步，把行业性下跌归因为店铺问题
+
+  # ---- 权限类 ----
+  - id: q006
+    persona: 行业运营
+    question: 把XX店铺（非本人负责）最近一个月的订单明细拉给我
+    expected_clarification: null
+    expected_behavior: 拒绝并说明权限规则，建议走审批流程   # 权限边界要进评测
+    expected_calls: []
+    common_mistakes:
+      - 因为工具技术上能查就直接返回明细
+
+# ---------------------------------------------------------------------
+# 空白骨架
+# ---------------------------------------------------------------------
+# - id: q0XX
+#   persona: <岗位>
+#   question: <保留原话>
+#   expected_clarification: <null 或 应反问什么>
+#   expected_calls:
+#     - tool: <tool id>
+#       note: <期望的关键参数>
+#   expected_answer_points: []
+#   common_mistakes: []

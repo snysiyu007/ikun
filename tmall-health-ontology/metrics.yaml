@@ -1,0 +1,180 @@
+# =====================================================================
+# metrics.yaml — 指标字典（口径唯一事实源）
+# 天猫国际·保健行业试点
+#
+# 这是整套底座里最重要的文件：agent 回答稳不稳，80% 取决于这里。
+# 规则：
+# 1. 每个指标必须有 owner，口径由 owner 签字后才能改 status: confirmed。
+# 2. agent 只使用 confirmed 指标；draft 指标回答时必须声明口径未确认。
+# 3. 有歧义的日常说法（"销售额""新客"）在 aliases 里挂到唯一指标上，
+#    歧义无法消除的写进 clarify_first。
+# =====================================================================
+
+version: 0.1
+updated: <YYYY-MM-DD>
+
+# ---------------------------------------------------------------------
+# 全局口径约定（常驻 agent system prompt 的部分）
+# ---------------------------------------------------------------------
+conventions:
+  default_time_range: 未指定时间时，默认取「昨天」，并在回答中注明   # TODO 按团队习惯改
+  week_definition: 周 = 自然周（周一至周日）                          # TODO 或近7天，二选一写死
+  default_scope: 未指定范围时，默认天猫国际保健行业大盘
+  refund_treatment: 支付口径指标默认「不剔退款」；剔退款用 *_net 指标  # TODO 与数仓确认
+  currency: 金额单位统一为人民币元
+  yoy_mom: 同比=去年同期同口径；环比=上一周期同口径；大促期间同比按「活动阶段对齐」而非自然日对齐
+  clarify_first:                        # 遇到这些说法必须先反问，不允许猜
+    - 「销售额」未指明支付/成交口径时 → 反问
+    - 「最近」未指明时间窗时 → 反问
+    - 「我的店/我的类目」无法从上下文确定具体对象时 → 反问
+
+# ---------------------------------------------------------------------
+# 指标定义
+# ---------------------------------------------------------------------
+metrics:
+
+  - id: pay_gmv
+    name: 支付GMV
+    aliases: [GMV, 销售额, 支付金额, 成交额]     # "销售额"默认落到这里；若团队有异议改 clarify_first
+    definition: 统计周期内买家支付成功的订单金额之和，不剔退款。
+    formula_sql: |
+      SUM(pay_amt)  -- 来源 <project>.<dwd_health_trd_df>, 过滤 pay_status='已支付'
+    applicable_objects: [item, brand, category, merchant, campaign]
+    dimensions: [time, category_level, trade_mode, channel, user_group]
+    unit: 元
+    pitfalls:
+      - 预售期定金是否计入：<TODO 确认，大促口径高发争议点>
+      - 不含退款；讨论"净销售"用 pay_gmv_net
+    owner: <数据owner>
+    status: draft
+
+  - id: pay_buyer_cnt
+    name: 支付买家数
+    aliases: [买家数, 支付人数, 购买人数]
+    definition: 统计周期内支付成功的去重买家数。
+    formula_sql: |
+      COUNT(DISTINCT buyer_id)  -- 同一买家多笔订单只算一人；跨天累计需重新去重，不能按天相加
+    applicable_objects: [item, brand, category, merchant]
+    dimensions: [time, category_level, trade_mode, channel, user_group]
+    unit: 人
+    pitfalls:
+      - 多天汇总必须重新去重，严禁把每日买家数直接相加
+    owner: <数据owner>
+    status: draft
+
+  - id: uv
+    name: 访客数
+    aliases: [UV, 流量, 访客]
+    definition: 统计周期内访问商品/店铺/类目页面的去重访客数。
+    formula_sql: |
+      COUNT(DISTINCT visitor_id)  -- 来源 <project>.<dws_health_traffic_df>
+    applicable_objects: [item, brand, category, merchant]
+    dimensions: [time, channel]
+    unit: 人
+    pitfalls:
+      - 流量表更新可能晚于交易表（T+1 vs T+2），跨表算转化率注意分区对齐
+    owner: <数据owner>
+    status: draft
+
+  - id: pay_rate
+    name: 支付转化率
+    aliases: [转化率, 支付转化]
+    definition: 支付买家数 / 访客数。
+    formula_sql: |
+      pay_buyer_cnt / NULLIF(uv, 0)
+    applicable_objects: [item, brand, category, merchant]
+    dimensions: [time, channel]
+    unit: "%"
+    pitfalls:
+      - 分子分母必须同粒度同周期；渠道拆分时分母用该渠道 UV
+    owner: <数据owner>
+    status: draft
+
+  - id: new_buyer_ratio
+    name: 新客占比
+    aliases: [新客比例, 拉新占比]
+    definition: 统计周期内新客买家数 / 支付买家数。
+    formula_sql: |
+      COUNT(DISTINCT IF(is_new_buyer=1, buyer_id, NULL)) / COUNT(DISTINCT buyer_id)
+    applicable_objects: [item, brand, category, merchant]
+    dimensions: [time]
+    unit: "%"
+    pitfalls:
+      - 「新客」定义必须写死：<TODO 近365天内首次购买？范围是店铺新客/品牌新客/行业新客？>
+      - 店铺新客 vs 品牌新客口径不同，用户不指明时按 clarify_first 反问
+    owner: <数据owner>
+    status: draft
+
+  - id: repurchase_rate
+    name: 复购率
+    aliases: [回购率]
+    definition: 统计周期内购买≥2次的买家数 / 支付买家数。
+    formula_sql: |
+      # TODO 窗口写死：周期内复购？还是 90 天滚动窗口？保健品常用 90/180 天
+    applicable_objects: [brand, category, merchant]
+    dimensions: [time]
+    unit: "%"
+    pitfalls:
+      - 保健品是高复购行业，窗口选择对数值影响巨大，必须先定窗口再上线
+    owner: <数据owner>
+    status: draft
+
+  - id: refund_rate
+    name: 退款率
+    aliases: [退款比例, 高退]
+    definition: 统计周期内退款金额 / 支付GMV。
+    formula_sql: |
+      SUM(refund_amt) / NULLIF(SUM(pay_amt), 0)
+    applicable_objects: [item, brand, category, merchant]
+    dimensions: [time, trade_mode]
+    unit: "%"
+    pitfalls:
+      - 仅退款 vs 退货退款是否都计入：<TODO 确认>
+      - 按「支付日」归属还是「退款日」归属：<TODO 确认，两种算法差异大>
+    owner: <数据owner>
+    status: draft
+
+  - id: atv
+    name: 客单价
+    aliases: [件单价, 客单]
+    definition: 支付GMV / 支付买家数。
+    formula_sql: |
+      SUM(pay_amt) / NULLIF(COUNT(DISTINCT buyer_id), 0)
+    applicable_objects: [item, brand, category, merchant]
+    dimensions: [time]
+    unit: 元
+    pitfalls:
+      - 客单价（按人）≠ 件单价（按件），黑话里常混用，见 glossary
+    owner: <数据owner>
+    status: draft
+
+  - id: search_uv
+    name: 搜索访客数
+    aliases: [搜索人气, 搜索流量]
+    definition: 通过手淘搜索渠道进入的去重访客数。
+    formula_sql: |
+      COUNT(DISTINCT visitor_id)  -- 过滤 channel='搜索', 来源 <project>.<dws_health_traffic_df>
+    applicable_objects: [item, brand, category]
+    dimensions: [time]
+    unit: 人
+    pitfalls:
+      - 与生意参谋口径可能不一致，对外沟通时注明数据来源
+    owner: <数据owner>
+    status: draft
+
+# ---------------------------------------------------------------------
+# 空白骨架：新增指标时复制这段
+# ---------------------------------------------------------------------
+# - id: <英文小写id>
+#   name: <中文名>
+#   aliases: []
+#   definition: <一句话业务定义>
+#   formula_sql: |
+#     <SQL 片段或伪代码，含来源表>
+#   applicable_objects: []
+#   dimensions: []
+#   unit: <单位>
+#   pitfalls:
+#     - <已知的坑>
+#   owner: <负责人>
+#   status: draft

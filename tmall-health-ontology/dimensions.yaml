@@ -1,0 +1,74 @@
+# =====================================================================
+# dimensions.yaml — 维度字典
+# 天猫国际·保健行业试点
+#
+# 维度 = 指标可以按什么拆。每个维度写清取值来源，
+# agent 取数时用维度 id 组装查询，不允许自造维度。
+# =====================================================================
+
+version: 0.1
+updated: <YYYY-MM-DD>
+
+dimensions:
+
+  - id: time
+    name: 时间
+    granularities: [day, week, month, campaign_phase]
+    notes:
+      - 周定义遵循 metrics.yaml conventions.week_definition
+      - campaign_phase 粒度按 campaign 对象的活动日历切分（预售/开门红/返场）
+      - 大促同比按活动阶段对齐，不按自然日对齐
+    source: 交易/流量表分区字段 ds
+    status: draft
+
+  - id: category_level
+    name: 类目层级
+    values: [一级类目, 二级类目, 叶子类目]
+    notes:
+      - 上卷路径走 category 对象的 parent_cate_id
+      - 保健行业试点范围 = <TODO 圈定的类目ID列表，写死在这里>
+    source: <project>.<dim_health_cate_df>
+    status: draft
+
+  - id: trade_mode
+    name: 贸易模式
+    values: [保税, 直邮, 一般贸易]
+    notes:
+      - 保税/直邮的物流时效和退款率差异大，诊断时常用拆分维度
+    source: item.trade_mode
+    status: draft
+
+  - id: channel
+    name: 流量渠道
+    values: [搜索, 推荐, 直播, 店铺自营, 付费推广, 站外, 其他]
+    notes:
+      - 渠道归因口径：<TODO 首次触点 / 末次触点，与流量数仓确认>
+      - 付费推广含直通车/万相台等，细拆见 glossary
+    source: <project>.<dws_health_traffic_df>.channel
+    status: draft
+
+  - id: user_group
+    name: 用户分群
+    values: [新客, 老客, 会员, 非会员]
+    notes:
+      - 新客定义遵循 metrics.yaml 中 new_buyer_ratio 的口径
+    source: 交易表 is_new_buyer / 会员表 <TODO>
+    status: draft
+
+  # 可选维度，试点期有需求再启用
+  # - id: origin_country
+  #   name: 原产国
+  #   source: item.origin_country
+  # - id: port
+  #   name: 口岸/仓
+  #   source: <物流表>
+
+# ---------------------------------------------------------------------
+# 空白骨架
+# ---------------------------------------------------------------------
+# - id: <英文小写id>
+#   name: <中文名>
+#   values: []          # 枚举型写 values；连续型写 granularities
+#   notes: []
+#   source: <来源表.字段>
+#   status: draft

@@ -1,0 +1,252 @@
+# =====================================================================
+# ontology.yaml — 对象类型与链接类型定义
+# 天猫国际·保健行业试点
+#
+# 原则：
+# 1. 每个对象类型必须回答三个问题：一行代表什么（粒度）、主键是什么、
+#    背后是哪张 ODPS 物化宽表。
+# 2. 对象的"属性"是相对静态的描述字段；会随时间变化的度量
+#   （GMV、访客数等）不放这里，统一进 metrics.yaml。
+# 3. 试点期对象控制在 8 个以内；qa_evalset 覆盖不到的不建。
+# =====================================================================
+
+version: 0.1
+industry: 天猫国际-保健行业
+updated: <YYYY-MM-DD>
+
+object_types:
+
+  # ---------------- 商品 ----------------
+  - id: item
+    name: 商品
+    synonyms: [宝贝, 链接, 单品, sku, spu]
+    description: 天猫国际保健行业在售/曾售商品。
+    grain: 一行 = 一个 <SPU / SKU>          # TODO 二选一并写死，粒度不清是取数错误的头号来源
+    primary_key: item_id
+    datasource:
+      odps_table: <project>.<dwd_health_item_wide_df>   # 物化宽表，提前 join 好品牌/类目/标签
+      partition: ds                                      # 分区字段
+      update: T+1
+    properties:
+      - {name: item_title,   type: string, desc: 商品标题}
+      - {name: brand_id,     type: string, desc: 品牌ID（外键 → brand）}
+      - {name: cate_id,      type: string, desc: 叶子类目ID（外键 → category）}
+      - {name: seller_id,    type: string, desc: 商家ID（外键 → merchant）}
+      - {name: price,        type: decimal, desc: 当前一口价（元）}
+      - {name: trade_mode,   type: enum,   desc: 贸易模式, values: [保税, 直邮, 一般贸易]}
+      - {name: origin_country, type: string, desc: 原产国/地区}
+      - {name: item_status,  type: enum,   desc: 商品状态, values: [在售, 下架, 删除]}
+      - {name: ingredient_ids, type: array<string>, desc: 成分ID列表（来自 kbase 抽取，外键 → ingredient）}
+      - {name: benefit_tags, type: array<string>, desc: 功效标签（来自 kbase，外键 → benefit）}
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 品牌 ----------------
+  - id: brand
+    name: 品牌
+    synonyms: [牌子]
+    description: 保健行业品牌（如 Swisse、GNC、FANCL 等，示例虚构不代表真实数据）。
+    grain: 一行 = 一个品牌
+    primary_key: brand_id
+    datasource:
+      odps_table: <project>.<dim_health_brand_df>
+      partition: ds
+      update: T+1
+    properties:
+      - {name: brand_name,    type: string, desc: 品牌中文名}
+      - {name: brand_name_en, type: string, desc: 品牌英文名}
+      - {name: brand_aliases, type: array<string>, desc: 常见别名/俗称，用于对话中的实体识别}
+      - {name: country,       type: string, desc: 品牌所属国家}
+      - {name: has_flagship,  type: boolean, desc: 是否有官方旗舰店}
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 商家 / 店铺 ----------------
+  - id: merchant
+    name: 商家
+    synonyms: [店铺, 卖家, 商户]
+    description: 天猫国际店铺。
+    grain: 一行 = 一个店铺
+    primary_key: seller_id
+    datasource:
+      odps_table: <project>.<dim_health_seller_df>
+      partition: ds
+      update: T+1
+    properties:
+      - {name: shop_name,  type: string, desc: 店铺名}
+      - {name: shop_type,  type: enum, desc: 店铺类型, values: [旗舰店, 专营店, 专卖店]}
+      - {name: main_cate,  type: string, desc: 主营类目}
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 类目 ----------------
+  - id: category
+    name: 类目
+    synonyms: [叶子类目, 行业, 品类]
+    description: 保健行业类目树节点（含各层级）。
+    grain: 一行 = 一个类目节点
+    primary_key: cate_id
+    datasource:
+      odps_table: <project>.<dim_health_cate_df>
+      partition: ds
+      update: T+1
+    properties:
+      - {name: cate_name,      type: string, desc: 类目名}
+      - {name: cate_level,     type: int,    desc: 层级（1=一级…叶子）}
+      - {name: parent_cate_id, type: string, desc: 父类目ID（自关联）}
+    owner: <建设者>
+    status: draft
+
+  # ---------------- 成分 ----------------
+  - id: ingredient
+    name: 成分
+    synonyms: [原料, 配方成分]
+    description: 保健品核心成分库（kbase 维护）。
+    grain: 一行 = 一个标准化成分
+    primary_key: ingredient_id
+    datasource:
+      kbase_entity: <kbase 实体类型名>
+      odps_table: <project>.<dim_health_ingredient_df>   # 若已同步到 ODPS
+    properties:
+      - {name: ingredient_name,    type: string, desc: 标准中文名（如 辅酶Q10）}
+      - {name: ingredient_name_en, type: string, desc: 英文名（如 CoQ10）}
+      - {name: aliases,            type: array<string>, desc: 同义词（如 泛醌），实体归一用}
+      - {name: compliance_status,  type: enum, desc: 跨境合规状态, values: [可售, 限制, 禁售]}
+      - {name: compliance_note,    type: string, desc: 合规备注（如剂量上限、适用贸易模式）}
+    owner: <kbase 负责人>
+    status: draft
+
+  # ---------------- 功效 ----------------
+  - id: benefit
+    name: 功效
+    synonyms: [功能, 卖点, 功效标签]
+    description: 功效标签体系（免疫、助眠、护肝、美白、骨骼关节、肠道健康…）。
+    grain: 一行 = 一个功效标签
+    primary_key: benefit_id
+    datasource:
+      kbase_entity: <kbase 实体类型名>
+    properties:
+      - {name: benefit_name, type: string, desc: 功效名}
+      - {name: claim_boundary, type: string, desc: 合规宣称边界（哪些说法能说/不能说）}  # 保健行业刚需
+    owner: <kbase 负责人>
+    status: draft
+
+  # ---------------- 人群 ----------------
+  - id: audience
+    name: 人群
+    synonyms: [目标人群, 适用人群]
+    description: 消费人群标签（中老年、孕产、健身、熬夜党、学生…）。
+    grain: 一行 = 一个人群标签
+    primary_key: audience_id
+    datasource:
+      kbase_entity: <kbase 实体类型名>
+    properties:
+      - {name: audience_name, type: string, desc: 人群名}
+      - {name: caution_note,  type: string, desc: 禁忌提示（如孕妇慎用成分关联）}
+    owner: <kbase 负责人>
+    status: draft
+
+  # ---------------- 大促活动 ----------------
+  - id: campaign
+    name: 大促活动
+    synonyms: [大促, 活动]
+    description: 平台级营销活动及其周期定义（618、双11、年货节…）。
+    grain: 一行 = 一个活动的一个阶段（如 双11-预售期）
+    primary_key: campaign_phase_id
+    datasource:
+      odps_table: <project>.<dim_campaign_calendar>      # 没有就先手工维护一张
+    properties:
+      - {name: campaign_name, type: string, desc: 活动名（如 2026双11）}
+      - {name: phase,         type: string, desc: 阶段（预售/开门红/返场…）}
+      - {name: start_date,    type: date,   desc: 阶段开始日}
+      - {name: end_date,      type: date,   desc: 阶段结束日}
+    owner: <行业运营>
+    status: draft
+
+  # ---------------- （预留，试点期不启用）岗位/人员 ----------------
+  # 当出现"派单 / 找人 / 按岗位推送"需求时再启用为正式对象。
+  # - id: role
+  #   name: 岗位
+  #   description: 行业运营 / 商家运营 / 数据分析 等岗位及负责范围（负责哪些类目/商家）。
+
+# =====================================================================
+# 链接类型：对象之间怎么连。cardinality 用 from:to 表示。
+# source 写清关系数据从哪来（外键 join / kbase 抽取 / 人工维护）。
+# =====================================================================
+link_types:
+
+  - id: item_belongs_brand
+    name: 商品-属于-品牌
+    from: item
+    to: brand
+    cardinality: N:1
+    source: 外键 item.brand_id
+    status: draft
+
+  - id: item_in_category
+    name: 商品-挂载-类目
+    from: item
+    to: category
+    cardinality: N:1
+    source: 外键 item.cate_id（类目自身通过 parent_cate_id 上卷）
+    status: draft
+
+  - id: brand_owned_by_merchant
+    name: 品牌-经营于-商家
+    from: brand
+    to: merchant
+    cardinality: N:M            # 一个品牌可能多店经营（旗舰店+专营店）
+    source: <project>.<rel_brand_seller 关系表>
+    status: draft
+
+  - id: item_contains_ingredient
+    name: 商品-含有-成分
+    from: item
+    to: ingredient
+    cardinality: N:M
+    source: kbase 从标题/详情页抽取
+    extra_fields:
+      - {name: confidence, type: decimal, desc: 抽取置信度 0-1，低于阈值的回答时要声明"可能"}
+    status: draft
+
+  - id: ingredient_supports_benefit
+    name: 成分-支持-功效
+    from: ingredient
+    to: benefit
+    cardinality: N:M
+    source: kbase 行业知识 + 合规审核（这条关系必须人审，涉及功效宣称合规）
+    status: draft
+
+  - id: benefit_targets_audience
+    name: 功效-面向-人群
+    from: benefit
+    to: audience
+    cardinality: N:M
+    source: kbase / 人工维护
+    status: draft
+
+  - id: item_joins_campaign
+    name: 商品-参与-大促
+    from: item
+    to: campaign
+    cardinality: N:M
+    source: <project>.<活动报名表>
+    status: draft
+
+# ---------------------------------------------------------------------
+# 空白骨架：新增对象时复制这段
+# ---------------------------------------------------------------------
+# - id: <英文小写id>
+#   name: <中文名>
+#   synonyms: []
+#   description: <一句话说明>
+#   grain: 一行 = <什么>
+#   primary_key: <主键字段>
+#   datasource:
+#     odps_table: <project>.<table>
+#     partition: ds
+#     update: T+1
+#   properties:
+#     - {name: <字段>, type: <类型>, desc: <说明>}
+#   owner: <负责人>
+#   status: draft
