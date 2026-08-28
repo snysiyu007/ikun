@@ -1,0 +1,165 @@
+<title>P2 / P3 文案编辑</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0C0918;background-image:radial-gradient(1200px 560px at 50% -10%,rgba(124,58,237,.20),transparent 70%);
+     color:#F6F2FF;font-family:'Sora','Noto Sans SC',system-ui,-apple-system,'PingFang SC',sans-serif;
+     font-weight:500;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:34px 26px 60px}
+h1{font-size:26px;font-weight:700}
+.lead{margin-top:8px;font-size:14px;color:#C6B4F5;line-height:1.7;max-width:880px}
+.lead em{font-style:normal;color:#F6F2FF;font-weight:700}
+h2{font-size:16px;font-weight:700;margin:32px 0 6px}
+h2 b{font-family:'JetBrains Mono',monospace;font-size:11px;color:#C6B4F5;border:1px solid rgba(167,139,250,.5);
+     border-radius:6px;padding:2px 7px;margin-right:9px;font-weight:500;vertical-align:middle}
+.hint{font-size:12px;color:#9C8CCB;margin-bottom:12px}
+.card{border:1px solid rgba(167,139,250,.3);border-radius:14px;background:rgba(139,92,246,.05);padding:16px 18px}
+.fs{display:grid;gap:11px}
+.f{display:flex;flex-direction:column;gap:5px}
+.f span{font-size:11.5px;color:#9C8CCB}
+input,textarea{width:100%;background:rgba(139,92,246,.08);border:1px solid rgba(167,139,250,.32);
+     border-radius:9px;padding:9px 12px;color:#F6F2FF;font-family:inherit;font-size:13.5px;line-height:1.6}
+textarea{resize:vertical}
+input:focus,textarea:focus{outline:none;border-color:rgba(196,181,253,.85);background:rgba(139,92,246,.15)}
+.row{display:grid;grid-template-columns:104px 1fr 1fr 96px;gap:10px;align-items:center;
+     padding:7px 0;border-bottom:1px solid rgba(167,139,250,.12)}
+.row:last-child{border-bottom:none}
+.orig{font-size:11.5px;color:#7B6CA6;font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis}
+.chead{display:grid;grid-template-columns:104px 1fr 1fr 96px;gap:10px;font-size:11px;color:#9C8CCB;
+       padding-bottom:8px;border-bottom:1px solid rgba(167,139,250,.26);letter-spacing:.04em}
+.hide{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#9C8CCB;cursor:pointer}
+.hide input{position:absolute;opacity:0;width:0;height:0}
+.box{width:16px;height:16px;border-radius:5px;border:1px dashed rgba(167,139,250,.6);display:block;
+     position:relative;flex:none}
+.hide input:checked+.box{background:linear-gradient(180deg,#9D55FF,#7A28E8);border:1px solid rgba(255,255,255,.2)}
+.hide input:checked+.box:after{content:'';position:absolute;left:5px;top:2px;width:4px;height:8px;
+     border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg)}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:28px 0 12px}
+button{font-family:inherit;font-size:13.5px;font-weight:700;border-radius:10px;padding:11px 20px;cursor:pointer;
+       border:1px solid rgba(255,255,255,.16);color:#fff;background:linear-gradient(180deg,#9D55FF,#7A28E8);
+       box-shadow:0 6px 16px rgba(74,20,140,.36)}
+button.ghost{background:rgba(167,139,250,.09);border:1px solid rgba(167,139,250,.45);color:#C6B4F5;box-shadow:none}
+button:hover{filter:brightness(1.08)}
+#msg{font-size:12.5px;color:#9C8CCB}
+pre{background:rgba(139,92,246,.07);border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:16px 18px;
+    font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:12.5px;line-height:1.8;color:#E4D8FF;
+    white-space:pre-wrap;user-select:all;max-height:340px;overflow:auto}
+@media (max-width:760px){.row,.chead{grid-template-columns:1fr}}
+</style>
+
+<script type="application/json" id="edit-state">{"fields":{},"hidden":[]}</script>
+
+<div class="wrap">
+  <h1>P2 / P3 文案编辑</h1>
+  <p class="lead">所有字段<em>已经预填成图上现在的内容</em>，改哪个动哪个，不动的保持原样。改完点「保存」，
+    我这边读到之后重画 P2、P3。<em>「谁配谁」的关系不在这页</em>——那个还在原来的勾选页改。</p>
+
+  <h2><b>P2</b>页面文案</h2>
+  <div class="card"><div class="fs"><label class="f"><span>标题</span><input data-k="p2.h1" value="场景 × 专家团 能力矩阵"></label><label class="f"><span>标题下的主旨句</span><input data-k="p2.claim" value="同一组专家反复复用在 8 个作战中心上——不是 8 套烟囱，是 1 套能力"></label><label class="f"><span>右上角图例说明</span><input data-k="p2.legend" value="该场景配置了这位专家，空格为不配置"></label><label class="f"><span>左上角表头</span><input data-k="p2.rowlabel" value="作战中心 / 主导岗位"></label><label class="f"><span>底部统计行的名字</span><input data-k="p2.ftlabel" value="被几个作战中心复用"></label><label class="f"><span>页脚论述（数字会自动算，改了就变成写死的）</span><textarea data-k="p2.take" rows="2">8 个作战中心、44 个配置，全部由 10 个专家承担——平均每个专家被 4.4 个场景复用；组织协同、任务执行 8 场景全覆盖。新增一个作战中心，平均只要补 1–2 个专属专家。</textarea></label><label class="f"><span>页脚小字</span><textarea data-k="p2.note" rows="2">底色四列为基础专家；空格表示该场景暂不配置该专家。每个专家配哪些 Skill 见下一页。</textarea></label></div></div>
+
+  <h2><b>P2</b>作战中心<span></span></h2>
+  <p class="hint">左边灰字是当前的名字（我用它对应回原数据，别管它）；改中间两栏即可。</p>
+  <div class="card">
+    <div class="chead"><span>当前</span><span>作战中心名称</span><span>主导岗位</span><span></span></div>
+    <div class="row"><span class="orig">行业销售</span><input data-k="scene.行业销售.1" value="行业销售" aria-label="作战中心名称"><input data-k="scene.行业销售.2" value="行业 GM" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:行业销售"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">竞对控比</span><input data-k="scene.竞对控比.1" value="竞对控比" aria-label="作战中心名称"><input data-k="scene.竞对控比.2" value="行业 GM" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:竞对控比"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">行业损益</span><input data-k="scene.行业损益.1" value="行业损益" aria-label="作战中心名称"><input data-k="scene.行业损益.2" value="行业 GM" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:行业损益"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">行业用户</span><input data-k="scene.行业用户.1" value="行业用户" aria-label="作战中心名称"><input data-k="scene.行业用户.2" value="行业 GM" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:行业用户"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">品类规划</span><input data-k="scene.品类规划.1" value="品类规划" aria-label="作战中心名称"><input data-k="scene.品类规划.2" value="品类组长" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:品类规划"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">商家复盘</span><input data-k="scene.商家复盘.1" value="商家复盘" aria-label="作战中心名称"><input data-k="scene.商家复盘.2" value="品类小二" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:商家复盘"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">新商新品</span><input data-k="scene.新商新品.1" value="新商新品" aria-label="作战中心名称"><input data-k="scene.新商新品.2" value="品类组长" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:新商新品"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">行业营销</span><input data-k="scene.行业营销.1" value="行业营销" aria-label="作战中心名称"><input data-k="scene.行业营销.2" value="营销小二" aria-label="主导岗位"><label class="hide"><input type="checkbox" data-c="scene:行业营销"><span class="box"></span>不显示</label></div>
+  </div>
+
+  <h2><b>P2 P3</b>专家</h2>
+  <p class="hint">「待命名」那四个是新增专家，还没有代号——你们的命名规律是「行业 + 人名/物名」，这里可以直接起名。</p>
+  <div class="card">
+    <div class="chead"><span>当前</span><span>职能名（图上大字）</span><span>代号（图上小字）</span><span></span></div>
+    <div class="row"><span class="orig">组织协同</span><input data-k="expert.组织协同.1" value="组织协同" aria-label="职能名"><input data-k="expert.组织协同.2" value="行业秘书处" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:组织协同"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">任务执行</span><input data-k="expert.任务执行.1" value="任务执行" aria-label="职能名"><input data-k="expert.任务执行.2" value="行业王进喜" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:任务执行"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">数据官</span><input data-k="expert.数据官.1" value="数据官" aria-label="职能名"><input data-k="expert.数据官.2" value="行业陈景润" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:数据官"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">知识官</span><input data-k="expert.知识官.1" value="知识官" aria-label="职能名"><input data-k="expert.知识官.2" value="行业藏书阁" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:知识官"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">品类洞察</span><input data-k="expert.品类洞察.1" value="品类洞察" aria-label="职能名"><input data-k="expert.品类洞察.2" value="待命名" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:品类洞察"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">竞对情报</span><input data-k="expert.竞对情报.1" value="竞对情报" aria-label="职能名"><input data-k="expert.竞对情报.2" value="行业猫头鹰" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:竞对情报"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">用户增长</span><input data-k="expert.用户增长.1" value="用户增长" aria-label="职能名"><input data-k="expert.用户增长.2" value="待命名" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:用户增长"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">财务官</span><input data-k="expert.财务官.1" value="财务官" aria-label="职能名"><input data-k="expert.财务官.2" value="行业葛朗台" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:财务官"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">外部咨询</span><input data-k="expert.外部咨询.1" value="外部咨询" aria-label="职能名"><input data-k="expert.外部咨询.2" value="待命名" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:外部咨询"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">营销创意</span><input data-k="expert.营销创意.1" value="营销创意" aria-label="职能名"><input data-k="expert.营销创意.2" value="待命名" aria-label="代号"><label class="hide"><input type="checkbox" data-c="expert:营销创意"><span class="box"></span>不显示</label></div>
+  </div>
+
+  <h2><b>P3</b>Skill</h2>
+  <div class="card">
+    <div class="chead"><span>当前</span><span>代号</span><span>中文动作名</span><span></span></div>
+    <div class="row"><span class="orig">target-data</span><input data-k="skill.target-data.1" value="target-data" aria-label="代号"><input data-k="skill.target-data.2" value="销售追踪" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:target-data"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">Kbsearch-tmg</span><input data-k="skill.Kbsearch-tmg.1" value="Kbsearch-tmg" aria-label="代号"><input data-k="skill.Kbsearch-tmg.2" value="知识调用" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:Kbsearch-tmg"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">cmr-tmg</span><input data-k="skill.cmr-tmg.1" value="cmr-tmg" aria-label="代号"><input data-k="skill.cmr-tmg.2" value="损益管理" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:cmr-tmg"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">AI-data-qd</span><input data-k="skill.AI-data-qd.1" value="AI-data-qd" aria-label="代号"><input data-k="skill.AI-data-qd.2" value="渠道取数" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:AI-data-qd"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">AI-data-pl</span><input data-k="skill.AI-data-pl.1" value="AI-data-pl" aria-label="代号"><input data-k="skill.AI-data-pl.2" value="品类取数" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:AI-data-pl"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">Renwu-bj</span><input data-k="skill.Renwu-bj.1" value="Renwu-bj" aria-label="代号"><input data-k="skill.Renwu-bj.2" value="任务找人" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:Renwu-bj"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">Zhenduan</span><input data-k="skill.Zhenduan.1" value="Zhenduan" aria-label="代号"><input data-k="skill.Zhenduan.2" value="明确任务" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:Zhenduan"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">category-scan</span><input data-k="skill.category-scan.1" value="category-scan" aria-label="代号"><input data-k="skill.category-scan.2" value="品类扫描" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:category-scan"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">category-planning</span><input data-k="skill.category-planning.1" value="category-planning" aria-label="代号"><input data-k="skill.category-planning.2" value="品类规划" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:category-planning"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">category-opportunity</span><input data-k="skill.category-opportunity.1" value="category-opportunity" aria-label="代号"><input data-k="skill.category-opportunity.2" value="品类机会" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:category-opportunity"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">category-bd</span><input data-k="skill.category-bd.1" value="category-bd" aria-label="代号"><input data-k="skill.category-bd.2" value="品类招商" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:category-bd"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">category-report</span><input data-k="skill.category-report.1" value="category-report" aria-label="代号"><input data-k="skill.category-report.2" value="品类报告" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:category-report"><span class="box"></span>不显示</label></div><div class="row"><span class="orig">category-meeting</span><input data-k="skill.category-meeting.1" value="category-meeting" aria-label="代号"><input data-k="skill.category-meeting.2" value="品类会议" aria-label="中文动作名"><label class="hide"><input type="checkbox" data-c="skill:category-meeting"><span class="box"></span>不显示</label></div>
+  </div>
+
+  <h2><b>P3</b>页面文案</h2>
+  <div class="card"><div class="fs"><label class="f"><span>标题</span><input data-k="p3.h1" value="每位专家手上的标准动作"></label><label class="f"><span>标题下的主旨句</span><textarea data-k="p3.claim" rows="2">Skill 挂在专家身上，专家是岗位 Agent 的子 Agent——同一个动作被不同专家反复调用</textarea></label><label class="f"><span>右上角图例说明</span><input data-k="p3.legend" value="动作后的 ×N＝有几位专家在用同一个动作；卡内按复用次数排序，每张最多列 4 个"></label><label class="f"><span>链路条 第 1 节</span><input data-k="p3.chain1" value="岗位 Agent"></label><label class="f"><span>链路条 第 1 个箭头</span><input data-k="p3.arrow1" value="拆解为"></label><label class="f"><span>链路条 第 2 节</span><input data-k="p3.chain2" value="场景运营专家团"></label><label class="f"><span>链路条 第 2 个箭头</span><input data-k="p3.arrow2" value="配置"></label><label class="f"><span>链路条 第 3 节（本页）</span><input data-k="p3.chain3" value="Skill"></label><label class="f"><span>每张卡最多列几个动作</span><input data-k="p3.rows" value="4"></label><label class="f"><span>卡片头部徽标的措辞</span><input data-k="p3.badge" value="N 个作战中心在用"></label><label class="f"><span>页脚论述（数字会自动算，改了就变成写死的）</span><textarea data-k="p3.take" rows="2">Skill 不是员工技能，是岗位动作的最小可复用单元。能力不再长在某个人身上——13 个动作被 10 位专家调用 29 次，新增一个作战中心，多数时候只是把现成的动作重新组合一次。</textarea></label></div></div>
+
+  <h2>还想改什么</h2>
+  <div class="card"><textarea data-k="note" rows="3" placeholder="例：P2 想把行业营销挪到第一行；P3 的卡片想按专家名笔画排…"></textarea></div>
+
+  <div class="bar">
+    <button id="save">保存修改</button>
+    <button class="ghost" id="copy">复制改动清单</button>
+    <span id="msg">改动会自动记在这台设备上；点保存才会同步给我。</span>
+  </div>
+  <pre id="out"></pre>
+</div>
+
+<script>
+(function () {
+  var PRISTINE = document.documentElement.outerHTML;
+  var LS = 'tmg-editor-v1';
+  var fs = Array.prototype.slice.call(document.querySelectorAll('[data-k]'));
+  var cs = Array.prototype.slice.call(document.querySelectorAll('[data-c]'));
+  var out = document.getElementById('out'), msg = document.getElementById('msg');
+  var BASE = {};
+  fs.forEach(function (el) { BASE[el.dataset.k] = el.value; });
+
+  function state() {
+    var f = {};
+    fs.forEach(function (el) { f[el.dataset.k] = el.value; });
+    return { fields: f, hidden: cs.filter(function (c) { return c.checked; })
+                                  .map(function (c) { return c.dataset.c; }) };
+  }
+  function apply(s) {
+    if (!s) return;
+    fs.forEach(function (el) { if (s.fields && s.fields[el.dataset.k] !== undefined) el.value = s.fields[el.dataset.k]; });
+    if (s.hidden) cs.forEach(function (c) { c.checked = s.hidden.indexOf(c.dataset.c) >= 0; });
+  }
+  function text() {
+    var s = state(), L = [];
+    Object.keys(s.fields).forEach(function (k) {
+      if (s.fields[k] !== BASE[k]) L.push('改 ' + k + '：' + BASE[k] + '  →  ' + s.fields[k]);
+    });
+    s.hidden.forEach(function (h) { L.push('隐藏 ' + h); });
+    return L.length ? L.join('\n') : '（还没有改动）';
+  }
+  function refresh() {
+    out.textContent = text();
+    try { localStorage.setItem(LS, JSON.stringify(state())); } catch (e) {}
+  }
+  try {
+    var v = localStorage.getItem(LS);
+    if (v) apply(JSON.parse(v));
+    else {
+      var st = JSON.parse(document.getElementById('edit-state').textContent);
+      if (st && st.fields && Object.keys(st.fields).length) apply(st);
+    }
+  } catch (e) {}
+  refresh();
+  fs.concat(cs).forEach(function (el) { el.addEventListener('input', refresh); });
+
+  document.getElementById('copy').addEventListener('click', function () {
+    var t = text();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(t).then(
+        function () { msg.textContent = '已复制，粘贴给我就行。'; },
+        function () { msg.textContent = '复制被挡了，手动选中下面的文字。'; });
+    } else { msg.textContent = '手动选中下面的文字复制。'; }
+  });
+  document.getElementById('save').addEventListener('click', function () {
+    msg.textContent = '保存中…';
+    (window.claude && window.claude.use ? window.claude.use('artifact') : Promise.resolve(null))
+      .then(function (art) {
+        if (!art || !art.publish) throw { code: 'not_granted' };
+        var body = PRISTINE.replace(
+          /(<script type="application\/json" id="edit-state">)[\s\S]*?(<\/script>)/,
+          function (m, a, b) { return a + JSON.stringify(state()) + b; });
+        return art.publish('<!doctype html>\n' + body);
+      })
+      .then(function () { msg.textContent = '已保存，我这边可以读到了。'; })
+      .catch(function (e) {
+        var c = (e && e.code) || '';
+        msg.textContent = (c === 'not_writer' || c === 'not_granted')
+          ? '这个视图没有写权限，点「复制改动清单」贴给我一样。'
+          : '保存没成功（' + (c || '未知') + '），点「复制改动清单」贴给我。';
+      });
+  });
+})();
+</script>
