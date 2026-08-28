@@ -13,8 +13,8 @@ CANVAS.mkdir(exist_ok=True)
 
 SCENES = ['行业销售','竞对控比','行业损益','行业用户','品类规划','商家复盘','新商新品','行业营销']
 ROLES  = ['行业 GM','品类组长','渠道组长','品类小二','渠道小二','用户小二','营销小二']
-EXPERTS= [('行业陈景润','数据官'),('行业藏书阁','知识库'),('行业猫头鹰','监视竞对'),
-          ('行业葛朗台','财务官'),('行业秘书处','组织协同'),('行业王进喜','任务执行')]
+EXPERTS= [('行业陈景润','数据分析子 Agent'),('行业藏书阁','知识库'),('行业猫头鹰','监视竞对'),
+          ('行业葛朗台','财务分析子 Agent'),('行业秘书处','组织协同子 Agent'),('行业王进喜','任务执行子 Agent')]
 SKILLS = [('target-data','销售追踪'),('Kbsearch-tmg','知识调用'),('cmr-tmg','损益管理'),
           ('AI-data-qd','渠道取数'),('AI-data-pl','品类取数'),('Renwu-bj','任务找人'),
           ('Zhenduan','明确任务')]
@@ -301,38 +301,38 @@ RAIL_BODY = f"""<div class="stage">
 # ==================================================== 汇报页 A — 能力复用矩阵
 # 列按覆盖场景数降序：基础四天然排在前面，外圈自然形成递减的尾巴
 EXPERT_COLS = [
-    ('组织协同', '行业秘书处', 'base'), ('任务执行', '行业王进喜', 'base'),
-    ('数据官',   '行业陈景润', 'base'), ('知识官',   '行业藏书阁', 'base'),
-    ('品类洞察', '待命名',     'scene'), ('竞对情报', '行业猫头鹰', 'scene'),
-    ('用户增长', '待命名',     'scene'), ('财务官',   '行业葛朗台', 'scene'),
-    ('外部咨询', '待命名',     'scene'), ('营销创意', '待命名',     'scene'),
+    ('组织协同子 Agent', '行业秘书处', 'base'), ('任务执行子 Agent', '行业王进喜', 'base'),
+    ('数据分析子 Agent',   '行业陈景润', 'base'), ('知识管理子 Agent',   '行业藏书阁', 'base'),
+    ('品类洞察子 Agent', '待命名',     'scene'), ('竞对监控子 Agent', '行业猫头鹰', 'scene'),
+    ('用户增长子 Agent', '待命名',     'scene'), ('财务分析子 Agent',   '行业葛朗台', 'scene'),
+    ('外部咨询子 Agent', '待命名',     'scene'), ('营销创意子 Agent', '待命名',     'scene'),
 ]
 # 来自勾选页的实际配置
 PICKS = {
-    '行业销售': ['组织协同','任务执行','数据官','知识官'],
-    '竞对控比': ['组织协同','任务执行','数据官','知识官','竞对情报','品类洞察'],
-    '行业损益': ['组织协同','任务执行','数据官','财务官'],
-    '行业用户': ['组织协同','任务执行','数据官','知识官','用户增长'],
-    '品类规划': ['组织协同','任务执行','数据官','知识官','竞对情报','外部咨询','品类洞察'],
-    '商家复盘': ['组织协同','任务执行','数据官','知识官','竞对情报','财务官','用户增长','品类洞察'],
-    '新商新品': ['组织协同','任务执行','数据官','知识官'],
-    '行业营销': ['组织协同','任务执行','知识官','营销创意','用户增长','品类洞察'],
+    '行业销售': ['组织协同子 Agent','任务执行子 Agent','数据分析子 Agent','知识管理子 Agent'],
+    '竞对控比': ['组织协同子 Agent','任务执行子 Agent','数据分析子 Agent','知识管理子 Agent','竞对监控子 Agent','品类洞察子 Agent'],
+    '行业损益': ['组织协同子 Agent','任务执行子 Agent','数据分析子 Agent','财务分析子 Agent'],
+    '行业用户': ['组织协同子 Agent','任务执行子 Agent','数据分析子 Agent','知识管理子 Agent','用户增长子 Agent'],
+    '品类规划': ['组织协同子 Agent','任务执行子 Agent','数据分析子 Agent','知识管理子 Agent','竞对监控子 Agent','外部咨询子 Agent','品类洞察子 Agent'],
+    '商家复盘': ['组织协同子 Agent','任务执行子 Agent','数据分析子 Agent','知识管理子 Agent','竞对监控子 Agent','财务分析子 Agent','用户增长子 Agent','品类洞察子 Agent'],
+    '新商新品': ['组织协同子 Agent','任务执行子 Agent','数据分析子 Agent','知识管理子 Agent'],
+    '行业营销': ['组织协同子 Agent','任务执行子 Agent','知识管理子 Agent','营销创意子 Agent','用户增长子 Agent','品类洞察子 Agent'],
 }
 OWNERS = {'行业销售':'行业 GM','竞对控比':'行业 GM','行业损益':'行业 GM','行业用户':'行业 GM',
           'x品类规划':'', '品类规划':'品类组长','商家复盘':'品类小二','新商新品':'品类组长','行业营销':'营销小二'}
 MATRIX_ROWS = [(sc, OWNERS[sc], {e: 1 for e in PICKS[sc]}) for sc in PICKS]
 EXPERT_SKILLS = {   # 来自勾选页
-    '组织协同': ['Renwu-bj', 'Zhenduan'],
-    '任务执行': ['Renwu-bj'],
-    '数据官':   ['target-data', 'AI-data-qd', 'AI-data-pl', 'category-meeting'],
-    '知识官':   ['Kbsearch-tmg'],
-    '品类洞察': ['target-data', 'Kbsearch-tmg', 'AI-data-pl', 'category-planning',
+    '组织协同子 Agent': ['Renwu-bj', 'Zhenduan'],
+    '任务执行子 Agent': ['Renwu-bj'],
+    '数据分析子 Agent':   ['target-data', 'AI-data-qd', 'AI-data-pl', 'category-meeting'],
+    '知识管理子 Agent':   ['Kbsearch-tmg'],
+    '品类洞察子 Agent': ['target-data', 'Kbsearch-tmg', 'AI-data-pl', 'category-planning',
                 'category-opportunity', 'category-bd', 'category-meeting'],
-    '竞对情报': ['category-scan', 'category-opportunity', 'category-report'],
-    '用户增长': ['Kbsearch-tmg', 'AI-data-pl', 'category-planning'],
-    '财务官':   ['cmr-tmg'],
-    '外部咨询': ['AI-data-pl', 'Zhenduan', 'category-opportunity'],
-    '营销创意': ['Kbsearch-tmg', 'Renwu-bj', 'Zhenduan', 'category-opportunity'],
+    '竞对监控子 Agent': ['category-scan', 'category-opportunity', 'category-report'],
+    '用户增长子 Agent': ['Kbsearch-tmg', 'AI-data-pl', 'category-planning'],
+    '财务分析子 Agent':   ['cmr-tmg'],
+    '外部咨询子 Agent': ['AI-data-pl', 'Zhenduan', 'category-opportunity'],
+    '营销创意子 Agent': ['Kbsearch-tmg', 'Renwu-bj', 'Zhenduan', 'category-opportunity'],
 }
 SKILL_CN = {
     'target-data': '销售追踪', 'Kbsearch-tmg': '知识调用', 'cmr-tmg': '损益管理',
@@ -365,6 +365,8 @@ MATRIX_CSS = """
   .mx-h{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;
         padding:0 4px 9px;text-align:center;border-bottom:1px solid rgba(167,139,250,.26)}
   .mx-h b{font-size:12.5px;font-weight:700;letter-spacing:.01em;white-space:nowrap}
+  .mx-h u{display:block;text-decoration:none;font-size:9.5px;color:#B9A9E8;letter-spacing:.02em;
+          margin-top:1px}
   .mx-h span{font-size:9.5px;color:#9C8CCB;letter-spacing:.04em}
   .mx-h.base{background:rgba(139,92,246,.10);border-radius:9px 9px 0 0}
   .mx-h.corner{border-bottom:1px solid rgba(167,139,250,.26);align-items:flex-start;padding-left:2px}
@@ -374,7 +376,7 @@ MATRIX_CSS = """
   .mx-r b{font-size:15px;font-weight:700}
   .mx-r span{font-size:10.5px;color:#C6B4F5;border:1px solid rgba(167,139,250,.42);
              border-radius:999px;padding:1px 8px;align-self:flex-start}
-  .mx-c{display:flex;align-items:center;justify-content:center;min-height:68px;
+  .mx-c{display:flex;align-items:center;justify-content:center;min-height:65px;
       border-bottom:1px solid rgba(167,139,250,.13)}
   .mx-c.base{background:rgba(139,92,246,.10)}
   .m{width:22px;height:22px;border-radius:7px;display:block;
@@ -400,7 +402,10 @@ MATRIX_CSS = """
 def matrix_body():
     cells = ['<div class="mx-h corner"><b>作战中心 / 主导岗位</b></div>']
     for name, nick, kind in EXPERT_COLS:
-        cells.append(f'<div class="mx-h {kind}"><b>{name}</b><span>{nick}</span></div>')
+        head_, _, _tail = name.partition('子 Agent')
+        suffix = '<u>子 Agent</u>' if _tail == '' and '子 Agent' in name else ''
+        cells.append(f'<div class="mx-h {kind}"><b>{head_}</b>{suffix}'
+                     f'<span>{nick}</span></div>')
     for scene, owner, marks in MATRIX_ROWS:
         cells.append(f'<div class="mx-r"><b>{scene}</b><span>{owner} 主导</span></div>')
         for name, _, kind in EXPERT_COLS:
@@ -419,7 +424,7 @@ def matrix_body():
 <div class="mx">{''.join(cells)}</div>
 <div class="mx-foot">
   <div><p class="take">8 个作战中心、{FILLED} 个配置，全部由 <em>10 个专家</em>承担——
-    平均每个专家被 <em>{AVG} 个场景复用</em>；组织协同、任务执行 8 场景全覆盖。
+    平均每个专家被 <em>{AVG} 个场景复用</em>；组织协同、任务执行两位 8 场景全覆盖。
     新增一个作战中心，平均只要补 <em>1–2 个专属专家</em>。</p>
     <p class="note">底色四列为基础专家；空格表示该场景暂不配置该专家。每个专家配哪些 Skill 见下一页。</p></div>
 </div>
