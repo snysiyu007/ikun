@@ -17,7 +17,10 @@ EXPERTS= [('行业陈景润','数据分析子 Agent'),('行业藏书阁','知识
           ('行业葛朗台','财务分析子 Agent'),('行业秘书处','组织协同子 Agent'),('行业王进喜','任务执行子 Agent')]
 SKILLS = [('target-data','销售追踪'),('Kbsearch-tmg','知识调用'),('cmr-tmg','损益管理'),
           ('AI-data-qd','渠道取数'),('AI-data-pl','品类取数'),('Renwu-bj','任务找人'),
-          ('Zhenduan','明确任务')]
+          ('Zhenduan','明确任务'),('category-scan','品类扫描'),('category-planning','品类规划'),
+          ('category-opportunity','品类机会'),('category-bd','品类招商'),
+          ('category-report','品类报告'),('category-meeting','品类会议'),
+          ('kbase-learning','知识学习'),('kbase-wiki','知识 wiki 化')]
 KB = [('L1','行业知识库','行业的通用信息，以对商文档为主'),
       ('L2','岗位知识库','行业的政策、资源扶持等核心内容'),
       ('L3','个人记忆画像','对应岗位的行业经验、商家判断、运营习惯等和个人意识相关的信息，由 Agent 使用中沉淀回流')]
@@ -34,9 +37,9 @@ CSS = """
        font-family:'Sora','Noto Sans SC',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
        font-weight:500;line-height:1.45;-webkit-font-smoothing:antialiased}
   a{color:#C6B4F5}a:hover{color:#E6DBFF}
-  .stage{width:1600px;max-width:100%;margin:0 auto;padding:30px 40px}
+  .stage{width:1600px;max-width:100%;margin:0 auto;padding:26px 40px}
   .mast{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;
-        padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid rgba(167,139,250,.26)}
+        padding-bottom:13px;margin-bottom:12px;border-bottom:1px solid rgba(167,139,250,.26)}
   .brand{display:flex;align-items:center;gap:14px}
   .mark{flex:none;width:38px;height:38px}
   h1{font-size:28px;font-weight:700;letter-spacing:.01em;text-wrap:balance}
@@ -47,14 +50,14 @@ CSS = """
        background:linear-gradient(180deg,#9D55FF,#7A28E8)}
   .key.g{background:rgba(167,139,250,.09);border:1px dashed rgba(167,139,250,.5)}
   .panel{border:1px dashed rgba(167,139,250,.26);border-radius:15px;
-         background:rgba(139,92,246,.045);padding:12px 15px 14px}
-  .head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+         background:rgba(139,92,246,.045);padding:10px 15px 12px}
+  .head{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
   .tier{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px;color:#C6B4F5;
         border:1px solid rgba(167,139,250,.5);border-radius:6px;padding:2px 7px;flex:none}
   h2{font-size:17px;font-weight:700;letter-spacing:.02em}
   .sub{font-size:12px;color:#9C8CCB}
-  .grid{display:grid;gap:9px}
-  .chip{border-radius:11px;padding:10px 12px;background:linear-gradient(180deg,#9D55FF,#7A28E8);
+  .grid{display:grid;gap:8px}
+  .chip{border-radius:11px;padding:9px 11px;background:linear-gradient(180deg,#9D55FF,#7A28E8);
         border:1px solid rgba(255,255,255,.16);
         box-shadow:0 6px 16px rgba(74,20,140,.36),inset 0 1px 0 rgba(255,255,255,.24);
         transition:transform .18s ease,box-shadow .18s ease}
@@ -65,13 +68,13 @@ CSS = """
   .chip.g b{color:#C6B4F5}.chip.g i{color:#9C8CCB}
   .chip.g:hover{transform:none;box-shadow:none;background:rgba(167,139,250,.14)}
   .mono b{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;font-weight:500}
-  .arrow{display:flex;align-items:center;justify-content:center;gap:9px;height:18px;color:#C6B4F5}
+  .arrow{display:flex;align-items:center;justify-content:center;gap:9px;height:15px;color:#C6B4F5}
   .arrow span{font-size:10.5px;letter-spacing:.1em;color:#9C8CCB}
-  .kb{margin-top:14px;border:1px solid rgba(129,140,248,.45);border-radius:15px;
-      background:rgba(67,56,202,.13);padding:12px 15px 14px}
+  .kb{margin-top:12px;border:1px solid rgba(129,140,248,.45);border-radius:15px;
+      background:rgba(67,56,202,.13);padding:10px 15px 12px}
   .kb .tier{color:#C7CCFF;border-color:rgba(165,180,252,.5)}
   .kb .grid{grid-template-columns:1fr 1fr 1.32fr;gap:12px}
-  .kbcard{border-radius:11px;padding:11px 14px;display:flex;flex-direction:column;gap:6px;
+  .kbcard{border-radius:11px;padding:10px 13px;display:flex;flex-direction:column;gap:6px;
           background:linear-gradient(180deg,#4C41C9,#2C2480);border:1px solid rgba(199,210,254,.26);
           box-shadow:0 6px 16px rgba(23,18,80,.5),inset 0 1px 0 rgba(255,255,255,.16)}
   .kbtop{display:flex;align-items:center;gap:9px}
@@ -114,7 +117,7 @@ def expert_chips():
             + '<div class="chip g slot"><b>等等…</b><i>按场景扩充</i></div>')
 def skill_chips():
     return (''.join(f'<div class="chip mono"><b>{k}</b><i>{v}</i></div>' for k, v in SKILLS)
-            + ''.join(f'<div class="chip g mono"><b>Skill {i}</b><i>xxx</i></div>' for i in range(1, 6)))
+            + '<div class="chip g mono"><b>Skill X…</b><i>扩展位</i></div>' * 3)
 def kb_cards():
     return ''.join(f'<div class="kbcard"><div class="kbtop"><span class="idx">{i}</span><b>{n}</b></div>'
                    f'<p>{d}</p></div>' for i, n, d in KB)
@@ -325,7 +328,7 @@ EXPERT_SKILLS = {   # 来自勾选页
     '组织协同子 Agent': ['Renwu-bj', 'Zhenduan'],
     '任务执行子 Agent': ['Renwu-bj'],
     '数据分析子 Agent':   ['target-data', 'AI-data-qd', 'AI-data-pl', 'category-meeting'],
-    '知识管理子 Agent':   ['Kbsearch-tmg'],
+    '知识管理子 Agent':   ['Kbsearch-tmg', 'kbase-learning', 'kbase-wiki'],
     '品类洞察子 Agent': ['target-data', 'Kbsearch-tmg', 'AI-data-pl', 'category-planning',
                 'category-opportunity', 'category-bd', 'category-meeting'],
     '竞对监控子 Agent': ['category-scan', 'category-opportunity', 'category-report'],
@@ -334,16 +337,10 @@ EXPERT_SKILLS = {   # 来自勾选页
     '外部咨询子 Agent': ['AI-data-pl', 'Zhenduan', 'category-opportunity'],
     '营销创意子 Agent': ['Kbsearch-tmg', 'Renwu-bj', 'Zhenduan', 'category-opportunity'],
 }
-SKILL_CN = {
-    'target-data': '销售追踪', 'Kbsearch-tmg': '知识调用', 'cmr-tmg': '损益管理',
-    'AI-data-qd': '渠道取数', 'AI-data-pl': '品类取数', 'Renwu-bj': '任务找人',
-    'Zhenduan': '明确任务', 'category-scan': '品类扫描', 'category-planning': '品类规划',
-    'category-opportunity': '品类机会', 'category-bd': '品类招商',
-    'category-report': '品类报告', 'category-meeting': '品类会议',
-}
+SKILL_CN = dict(SKILLS)
 DOMAINS = [
     ('取数类', '把各系统的数拿回来', ['target-data', 'AI-data-qd', 'AI-data-pl']),
-    ('知识类', '调政策、规则与历史打法', ['Kbsearch-tmg']),
+    ('知识类', '调政策、规则与历史打法', ['Kbsearch-tmg', 'kbase-learning', 'kbase-wiki']),
     ('财务类', '算账与投产比', ['cmr-tmg']),
     ('任务类', '把结论变成派得下去的活', ['Renwu-bj', 'Zhenduan']),
     ('品类类', '品类经营的专属动作', ['category-scan', 'category-planning', 'category-opportunity',
@@ -676,7 +673,7 @@ KB_TIERS = [
 ]
 WHEEL = [
     ('采集', '白皮书 · 内部群 · Agent 交流'),
-    ('Agent 蒸馏', '自动结构化入库'),
+    ('Agent 蒸馏', '自动结构化入库', 'kbase-wiki · kbase-learning'),
     ('分层供给', '按权限分发到三层'),
     ('Agent 调用', '在作战中心里被用起来'),
     ('回流沉淀', '写回个人记忆画像'),
@@ -711,6 +708,8 @@ KB_CSS = """
       border:1px solid rgba(165,180,252,.42);backdrop-filter:blur(2px)}
   .wn b{display:block;font-size:13px;font-weight:700}
   .wn em{display:block;font-style:normal;font-size:10px;color:#B9BEEB;margin-top:2px;line-height:1.45}
+  .wn s{display:block;text-decoration:none;font-family:'JetBrains Mono',ui-monospace,monospace;
+        font-size:9px;color:rgba(255,255,255,.72);margin-top:3px;letter-spacing:-.01em}
   .wn.key{background:linear-gradient(180deg,#6D6BE0,#3B32A6);border-color:rgba(255,255,255,.24);
           box-shadow:0 6px 18px rgba(23,18,80,.5)}
   .wn.key em{color:rgba(255,255,255,.78)}
@@ -751,12 +750,14 @@ def kb_body():
 
     C, R = 260, 175
     nodes = ''
-    for i, (t, sub) in enumerate(WHEEL):
+    for i, item in enumerate(WHEEL):
+        t, sub = item[0], item[1]
+        code = f'<s>{item[2]}</s>' if len(item) > 2 else ''
         a = math.radians(-90 + i * 72)
         x, y = C + R * math.cos(a), C + R * math.sin(a)
         key = ' key' if t == 'Agent 蒸馏' else ''
         nodes += (f'<div class="wn{key}" style="left:{x:.0f}px;top:{y:.0f}px">'
-                  f'<b>{t}</b><em>{sub}</em></div>')
+                  f'<b>{t}</b><em>{sub}</em>{code}</div>')
     arrows = ''
     for i in range(5):
         a = math.radians(-90 + i * 72 + 36)
@@ -812,9 +813,9 @@ canvas = {
   {"file":"Shelf.dc.html","title":"P3 · 专家的标准动作","page":"page-1","x":3520,"y":0,"w":1600,"h":900},
   {"file":"SalesFlow.dc.html","title":"P4 · 行业销售端到端","page":"page-1","x":5280,"y":0,"w":1600,"h":900},
   {"file":"KB.dc.html","title":"P5 · 三层知识库","page":"page-1","x":7040,"y":0,"w":1600,"h":900},
-  {"file":"Enclosure.dc.html","title":"方向二 · 环抱式","page":"page-2","x":0,"y":0,"w":1600,"h":900},
-  {"file":"Granularity.dc.html","title":"方向三 · 粒度阶梯","page":"page-2","x":1760,"y":0,"w":1600,"h":900},
-  {"file":"Rail.dc.html","title":"方向四 · 横向流水线","page":"page-2","x":3520,"y":0,"w":1600,"h":830}
+  {"file":"Enclosure.dc.html","title":"方向二 · 环抱式","page":"page-2","x":0,"y":0,"w":1600,"h":935},
+  {"file":"Granularity.dc.html","title":"方向三 · 粒度阶梯","page":"page-2","x":1760,"y":0,"w":1600,"h":950},
+  {"file":"Rail.dc.html","title":"方向四 · 横向流水线","page":"page-2","x":3520,"y":0,"w":1600,"h":925}
  ],
  "annotations":[
   {"id":"note-p5","page":"page-1","x":7040,"y":-160,"w":520,
